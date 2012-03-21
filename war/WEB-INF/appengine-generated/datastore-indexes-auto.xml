@@ -1,0 +1,17 @@
+<!-- Indices written at Fri, 9 Oct 2009 15:51:28 UTC -->
+
+<datastore-indexes>
+
+    <!-- Used 2 times in query history -->
+    <datastore-index kind="EventGroup" ancestor="false" source="auto">
+        <property name="eventClassId" direction="asc"/>
+        <property name="displayOrder" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Event" ancestor="false" source="auto">
+        <property name="groupId" direction="asc"/>
+        <property name="displayOrder" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

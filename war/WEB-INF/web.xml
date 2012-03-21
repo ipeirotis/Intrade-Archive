@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+	<servlet>
+		<servlet-name>storeClosingPrices</servlet-name>
+		<servlet-class>intrade.scripts.StoreClosingPrices</servlet-class>
+		<init-param>
+			<param-name>param-name</param-name>
+			<param-value>param-value</param-value>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>processEventGroup</servlet-name>
+		<servlet-class>intrade.scripts.ProcessEventGroup</servlet-class>
+	</servlet>
+		<servlet>
+		<servlet-name>processContractClosingPrices</servlet-name>
+		<servlet-class>intrade.scripts.ProcessContractClosingPrices</servlet-class>
+	</servlet>
+		<servlet>
+		<servlet-name>processEventClass</servlet-name>
+		<servlet-class>intrade.scripts.ProcessEventClass</servlet-class>
+	</servlet>
+		<servlet>
+		<servlet-name>processEvent</servlet-name>
+		<servlet-class>intrade.scripts.ProcessEvent</servlet-class>
+	</servlet>
+		<servlet>
+		<servlet-name>storeContracts</servlet-name>
+		<servlet-class>intrade.scripts.StoreContracts</servlet-class>
+	</servlet>
+			<servlet>
+		<servlet-name>storeTrades</servlet-name>
+		<servlet-class>intrade.scripts.StoreTrades</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>fetchMarketOverview</servlet-name>
+		<servlet-class>intrade.scripts.FetchMarketOverview</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>delete</servlet-name>
+		<servlet-class>intrade.scripts.TruncateServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>processContractTrades</servlet-name>
+		<servlet-class>intrade.scripts.ProcessContractTrades</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>processEventGroup</servlet-name>
+		<url-pattern>/processEventGroup</url-pattern>
+	</servlet-mapping>
+	
+		<servlet-mapping>
+		<servlet-name>processContractTrades</servlet-name>
+		<url-pattern>/processContractTrades</url-pattern>
+	</servlet-mapping>
+	
+			<servlet-mapping>
+		<servlet-name>processEventClass</servlet-name>
+		<url-pattern>/processEventClass</url-pattern>
+	</servlet-mapping>
+		<servlet-mapping>
+		<servlet-name>processEvent</servlet-name>
+		<url-pattern>/processEvent</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>storeClosingPrices</servlet-name>
+		<url-pattern>/storeClosingPrices</url-pattern>
+	</servlet-mapping>
+		<servlet-mapping>
+		<servlet-name>storeTrades</servlet-name>
+		<url-pattern>/storeTrades</url-pattern>
+	</servlet-mapping>
+		<servlet-mapping>
+		<servlet-name>processContractClosingPrices</servlet-name>
+		<url-pattern>/processContractClosingPrices</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>fetchMarketOverview</servlet-name>
+		<url-pattern>/fetchMarketOverview</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>delete</servlet-name>
+		<url-pattern>/delete</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/delete</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+	
+</web-app>
