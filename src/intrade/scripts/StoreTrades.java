@@ -49,7 +49,7 @@ public class StoreTrades extends HttpServlet {
 			print(query);
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Query q = pm.newQuery(query);
-			q.setRange(0, 100);
+			q.setRange(0, 200);
 			Queue queue = QueueFactory.getDefaultQueue();
 			@SuppressWarnings("unchecked")
 			List<Contract> results = (List<Contract>) q.execute();

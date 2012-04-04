@@ -13,6 +13,6 @@
     <cron>
     <url>/storeTrades</url>
     <description>Fetch the trades for all active contracts</description>
-    <schedule>every 10 minutes</schedule>
+    <schedule>every 60 minutes</schedule>
   </cron>
 </cronentries>
