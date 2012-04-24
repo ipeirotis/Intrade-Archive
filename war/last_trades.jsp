@@ -11,6 +11,19 @@
 <%@ page import="javax.jdo.Query" %>
 
 <html>
+<head><style type="text/css">
+ #trade {
+    display: table;
+    }
+
+  #row  {
+    display: table-row;
+    }
+
+  #date, #price, #volume {
+    display: table-cell;
+    }
+</style></head>
   <body>
 
 <%
@@ -20,7 +33,7 @@ String cid = request.getParameter("contract");
     PersistenceManager pm = PMF.get().getPersistenceManager();
     String query = "select from " + ContractTrade.class.getName() + " order by date DESC";
     Query q = pm.newQuery(query);
-    q.setRange(0, 100);
+    q.setRange(0, 1000);
     List<ContractTrade> prices = (List<ContractTrade>) q.execute();
     if (prices.isEmpty()) {
 %>
@@ -29,26 +42,26 @@ String cid = request.getParameter("contract");
     } else {
 %>
 <center>
-<h1>Latest trades on Intrade.com</h1>
+<h1>Latest 1,000 trades on Intrade.com</h1>
 
-<table border=1 cellpadding=5>
-<tr>
-<th>Contract</th>
-<th>Date</th>
-<th>Price</th>
-<th>Volume</th>
-</tr>
+<div id="trades">
+<div id="row">
+<div id="contract">Contract</div>
+<div id="date">Date</div>
+<div id="price">Price</div>
+<div id="volume">Volume</div>
+</div>
 <%
    for (ContractTrade p: prices) {
 	   Contract c = pm.getObjectById(Contract.class, Contract.generateKeyFromID(p.getContractid()));
 	   
 %>
-<tr>
-<td><a href="trades.jsp?contract=<%= p.getContractid() %>"><%= c.getSymbol() %></a></td>
-<td><%= DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(p.getDate()) %></a></td>
-<td><%= p.getPrice() %></a></td>
-<td><%= p.getVolume() %></a></td>
-</tr>
+<div id="row">
+<div id="contract"><a href="trades.jsp?contract=<%= p.getContractid() %>"><%= c.getSymbol() %></a></div>
+<div id="date"><%= DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(p.getDate()) %></a></div>
+<div id="price"><%= p.getPrice() %></a></div>
+<div id="volume"><%= p.getVolume() %></a></div>
+</div>
 <%
 }
     }

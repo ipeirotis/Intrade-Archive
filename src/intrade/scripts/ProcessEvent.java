@@ -24,23 +24,23 @@ import org.w3c.dom.NodeList;
 @SuppressWarnings("serial")
 public class ProcessEvent extends HttpServlet {
 
-	public static String url = FetchMarketOverview.url;
+	public static String	url											= FetchMarketOverview.url;
 
-	public static int time_threshold_minutes = 180;
+	public static int			time_threshold_minutes	= 180;
 
 	private static int time_threshold() {
+
 		return time_threshold_minutes * 60 * 1000;
 	}
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		doGet(req, resp);
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		PersistenceManager pm = null;
 		try {
@@ -79,8 +79,7 @@ public class ProcessEvent extends HttpServlet {
 
 			MarketXML m = null;
 			try {
-				m = pm.getObjectById(MarketXML.class,
-						MarketXML.generateKeyFromID(url));
+				m = pm.getObjectById(MarketXML.class, MarketXML.generateKeyFromID(url));
 			} catch (Exception e) {
 				m = null;
 			}
@@ -90,8 +89,7 @@ public class ProcessEvent extends HttpServlet {
 				NodeList n = d.getElementsByTagName("Event");
 				for (int i = 0; i < n.getLength(); i++) {
 					Node nd = n.item(i);
-					String event_id = nd.getAttributes().getNamedItem("id")
-							.getNodeValue();
+					String event_id = nd.getAttributes().getNamedItem("id").getNodeValue();
 					if (!event_id.equals(event))
 						continue;
 					storeEvent(nd);
@@ -114,12 +112,12 @@ public class ProcessEvent extends HttpServlet {
 	}
 
 	private long lastRetrieved_event(String event_id) {
+
 		Event event = null;
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			event = pm.getObjectById(Event.class,
-					Event.generateKeyFromID(event_id));
+			event = pm.getObjectById(Event.class, Event.generateKeyFromID(event_id));
 		} catch (Exception e) {
 			event = null;
 		}
@@ -127,22 +125,15 @@ public class ProcessEvent extends HttpServlet {
 		return (event == null) ? 0 : event.getLastretrieved();
 	}
 
-	private Contract parseContract(Node contract, String eventid, Long start,
-			Long end) {
-		String contract_id = contract.getAttributes().getNamedItem("id")
-				.getNodeValue();
-		String contract_ccy = contract.getAttributes().getNamedItem("ccy")
-				.getNodeValue();
-		String contract_inRunning = contract.getAttributes()
-				.getNamedItem("inRunning").getNodeValue();
-		String contract_state = contract.getAttributes().getNamedItem("state")
-				.getNodeValue();
-		String contract_tickSize = contract.getAttributes()
-				.getNamedItem("tickSize").getNodeValue();
-		String contract_tickValue = contract.getAttributes()
-				.getNamedItem("tickValue").getNodeValue();
-		String contract_type = contract.getAttributes().getNamedItem("type")
-				.getNodeValue();
+	private Contract parseContract(Node contract, String eventid, Long start, Long end) {
+
+		String contract_id = contract.getAttributes().getNamedItem("id").getNodeValue();
+		String contract_ccy = contract.getAttributes().getNamedItem("ccy").getNodeValue();
+		String contract_inRunning = contract.getAttributes().getNamedItem("inRunning").getNodeValue();
+		String contract_state = contract.getAttributes().getNamedItem("state").getNodeValue();
+		String contract_tickSize = contract.getAttributes().getNamedItem("tickSize").getNodeValue();
+		String contract_tickValue = contract.getAttributes().getNamedItem("tickValue").getNodeValue();
+		String contract_type = contract.getAttributes().getNamedItem("type").getNodeValue();
 
 		String contract_name = "";
 		String contract_symbol = "";
@@ -162,25 +153,20 @@ public class ProcessEvent extends HttpServlet {
 			} else if (nd_name.equals("totalVolume")) {
 				contract_totalVolume = nd.getTextContent();
 			} else if (nd_name.equals("date")) {
-				if (nd.getAttributes().getNamedItem("name").getNodeValue()
-						.equals("expiryDate")) {
+				if (nd.getAttributes().getNamedItem("name").getNodeValue().equals("expiryDate")) {
 
-					contract_expiryDate = nd.getAttributes()
-							.getNamedItem("val").getNodeValue();
+					contract_expiryDate = nd.getAttributes().getNamedItem("val").getNodeValue();
 				} else {
-					System.err.println("Found unexpected date type:"
-							+ nd.getAttributes().getNamedItem("name")
-									.getNodeValue());
+					System.err.println("Found unexpected date type:" + nd.getAttributes().getNamedItem("name").getNodeValue());
 				}
 			} else if (nd_name.equals("expiryPrice")) {
 				contract_expiryPrice = nd.getTextContent();
 			}
 		}
 
-		Contract con = new Contract(contract_id, eventid, contract_name,
-				contract_symbol, contract_totalVolume, contract_ccy,
-				contract_inRunning, contract_state, contract_tickSize,
-				contract_tickValue, contract_type, start, end);
+		Contract con = new Contract(contract_id, eventid, contract_name, contract_symbol, contract_totalVolume,
+				contract_ccy, contract_inRunning, contract_state, contract_tickSize, contract_tickValue, contract_type, start,
+				end);
 
 		if (contract_expiryDate != null) {
 			con.setExpiryDate(Long.parseLong(contract_expiryDate));
@@ -193,8 +179,7 @@ public class ProcessEvent extends HttpServlet {
 		return con;
 	}
 
-	private long storeContracts(Node contract, String eventid, Long start,
-			Long end) {
+	private long storeContracts(Node contract, String eventid, Long start, Long end) {
 
 		long now = (new Date()).getTime();
 
@@ -204,8 +189,7 @@ public class ProcessEvent extends HttpServlet {
 		Contract stored_contract = null;
 
 		try {
-			stored_contract = pm.getObjectById(Contract.class,
-					Contract.generateKeyFromID(con.getId()));
+			stored_contract = pm.getObjectById(Contract.class, Contract.generateKeyFromID(con.getId()));
 		} catch (Exception e) {
 			stored_contract = null;
 		}
@@ -223,6 +207,7 @@ public class ProcessEvent extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();
@@ -243,12 +228,9 @@ public class ProcessEvent extends HttpServlet {
 			return lastretrieval;
 		}
 
-		String event_gid = nd.getAttributes().getNamedItem("groupID")
-				.getNodeValue();
-		String event_start = nd.getAttributes().getNamedItem("StartDate")
-				.getNodeValue();
-		String event_end = nd.getAttributes().getNamedItem("EndDate")
-				.getNodeValue();
+		String event_gid = nd.getAttributes().getNamedItem("groupID").getNodeValue();
+		String event_start = nd.getAttributes().getNamedItem("StartDate").getNodeValue();
+		String event_end = nd.getAttributes().getNamedItem("EndDate").getNodeValue();
 
 		String event_name = "";
 		String event_displayorder = "";
@@ -280,8 +262,7 @@ public class ProcessEvent extends HttpServlet {
 			}
 		}
 
-		Event ev = new Event(event_id, event_gid, event_name,
-				event_displayorder, event_description, start, end);
+		Event ev = new Event(event_id, event_gid, event_name, event_displayorder, event_description, start, end);
 		ev.setLastretrieved(oldest_updatetime);
 		print("Storing:" + ev.toString());
 

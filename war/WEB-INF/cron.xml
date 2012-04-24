@@ -3,7 +3,7 @@
   <cron>
     <url>/fetchMarketOverview?url=http://pages.stern.nyu.edu/~panos/intrade/intrade.xml</url>
     <description>Fetch the active and expired Intrade contracts every 1 hour. Get the cached copy because calling directly Intrade times out Google App Engine</description>
-    <schedule>every 60 minutes</schedule>
+    <schedule>every 6 hours</schedule>
   </cron>
   <cron>
     <url>/storeClosingPrices</url>
@@ -13,6 +13,6 @@
     <cron>
     <url>/storeTrades</url>
     <description>Fetch the trades for all active contracts</description>
-    <schedule>every 60 minutes</schedule>
+    <schedule>every 100 minutes</schedule>
   </cron>
 </cronentries>

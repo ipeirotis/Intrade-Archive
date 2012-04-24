@@ -21,6 +21,19 @@ Contract c = pm.getObjectById(Contract.class, Contract.generateKeyFromID(cid));
 %>
 <head>
 <title>Trade history for <%= c.getSymbol()%>: <%=c.getName() %></title>
+<style type="text/css">
+ #trade {
+    display: table;
+    }
+
+  #row  {
+    display: table-row;
+    }
+
+  #date, #price, #volume {
+    display: table-cell;
+    }
+</style>
 </head>
  <body><center>
  <h1>Trades for <%= c.getSymbol() %></h1>
@@ -29,9 +42,9 @@ Contract c = pm.getObjectById(Contract.class, Contract.generateKeyFromID(cid));
 <a href="/processContractTrades?contract=<%=c.getId() %>&time_threshold_minutes=0">Refresh</a><br>
  
 <% 
-    String query = "select from " + ContractTrade.class.getName() + " where contractid==\""+cid+"\" order by date";
+    String query = "select from " + ContractTrade.class.getName() + " where contractid==\""+cid+"\" order by date DESC";
     Query q = pm.newQuery(query);
-    q.setRange(0, 1000);
+    //q.setRange(0, 1000);
     List<ContractTrade> prices = (List<ContractTrade>) q.execute();
     if (prices.isEmpty()) {
 %>
@@ -55,27 +68,30 @@ Embed code:<br>
 &lt;object id="chart" type="text/html" data="http://intrade-archive.appspot.com/embed_visualize_contract_trades.jsp?id=<%=c.getId()%>&volume=n" style="width:400px;height:250px;"&gt;&lt;/object&gt;
 </textarea>
 <br>
-<table border=1 cellpadding=5>
-<tr>
-<th>Date</th>
-<th>Price</th>
-<th>Volume</th>
-</tr>
+<div id="trade">
+<div id="row">
+<div id="date">Date</div>
+<div id="price">Price</div>
+<div id="volume">Volume</div>
+</div>
+
 <%
    for (ContractTrade p: prices) {
 %>
-<tr>
-<td><%= DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(p.getDate()) %></a></td>
-<td><%= p.getPrice() %></a></td>
-<td><%= p.getVolume() %></a></td>
-</tr>
+
+<div id="row">
+<div  id="date"><%= DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(p.getDate()) %></div>
+<div  id="price"><%= p.getPrice() %></a></div>
+<div id="volume"><%= p.getVolume() %></a></div>
+</div>
+
 <%
 }
     }
     
     pm.close();
 %>
-</table>
+</div>
 <p>
 For any bug reports or feature requests, contact <a href="http://www.stern.nyu.edu/~panos">Panos Ipeirotis</a>.<br>
 The code is available at <a href="http://code.google.com/p/intrade-archive/">Google Code</a>.<br>

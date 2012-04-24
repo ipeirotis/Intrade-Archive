@@ -21,10 +21,10 @@ import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 @SuppressWarnings("serial")
 public class StoreClosingPrices extends HttpServlet {
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		try {
 			String t = req.getParameter("time_threshold_minutes");
 			Integer threshold = Contract.getTime_threshold_minutes();
@@ -45,29 +45,22 @@ public class StoreClosingPrices extends HttpServlet {
 
 			// First get the expired contracts that have not been archived yet
 			// Get the prices and archive them
-			query = "SELECT FROM "
-					+ Contract.class.getName()
-					+ " WHERE expiryDate>0 && archived==false ORDER BY expiryDate";
+			query = "SELECT FROM " + Contract.class.getName() + " WHERE expiryDate>0 && archived==false ORDER BY expiryDate";
 			print(query);
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Query q = pm.newQuery(query);
 			Queue queue = QueueFactory.getDefaultQueue();
 			@SuppressWarnings("unchecked")
 			List<Contract> results = (List<Contract>) q.execute();
-			print("Putting in queue for processing " + results.size()
-					+ " contracts.");
+			print("Putting in queue for processing " + results.size() + " contracts.");
 			for (Contract c : results) {
 				String contractid = c.getId();
 				// print("Adding contract "+contractid+
 				// " in the queue. Will not archive.");
-				queue.add(Builder.withUrl("/processContractClosingPrices")
-						.param("contract", contractid).param("archive", "y")
-						.param("time_threshold_minutes", threshold.toString())
-						.method(TaskOptions.Method.GET));
-				queue.add(Builder.withUrl("/processContractTrades")
-						.param("contract", contractid)
-						.param("time_threshold_minutes", "1")
-						.method(TaskOptions.Method.GET));
+				queue.add(Builder.withUrl("/processContractClosingPrices").param("contract", contractid).param("archive", "y")
+						.param("time_threshold_minutes", threshold.toString()).method(TaskOptions.Method.GET));
+				queue.add(Builder.withUrl("/processContractTrades").param("contract", contractid)
+						.param("time_threshold_minutes", "1").method(TaskOptions.Method.GET));
 			}
 			pm.close();
 
@@ -76,10 +69,7 @@ public class StoreClosingPrices extends HttpServlet {
 			// Do no archive yet.
 
 			long now = (new Date()).getTime();
-			query = "SELECT FROM "
-					+ Contract.class.getName()
-					+ " WHERE laststoredCSV<"
-					+ (now - Contract.time_threshold())
+			query = "SELECT FROM " + Contract.class.getName() + " WHERE laststoredCSV<" + (now - Contract.time_threshold())
 					+ " && expiryDate==0 && archived==false  ORDER BY laststoredCSV";
 			print(query);
 			pm = PMF.get().getPersistenceManager();
@@ -88,20 +78,15 @@ public class StoreClosingPrices extends HttpServlet {
 			@SuppressWarnings("unchecked")
 			List<Contract> results_remaining = (List<Contract>) q.execute();
 
-			print("Putting in queue for processing " + results_remaining.size()
-					+ " contracts.");
+			print("Putting in queue for processing " + results_remaining.size() + " contracts.");
 			for (Contract c : results_remaining) {
 				String contractid = c.getId();
 				// print("Adding contract "+contractid+
 				// " in the queue. Will not archive.");
-				queue.add(Builder.withUrl("/processContractClosingPrices")
-						.param("contract", contractid).param("archive", "n")
-						.param("time_threshold_minutes", threshold.toString())
-						.method(TaskOptions.Method.GET));
-				queue.add(Builder.withUrl("/processContractTrades")
-						.param("contract", contractid)
-						.param("time_threshold_minutes", "1")
-						.method(TaskOptions.Method.GET));
+				queue.add(Builder.withUrl("/processContractClosingPrices").param("contract", contractid).param("archive", "n")
+						.param("time_threshold_minutes", threshold.toString()).method(TaskOptions.Method.GET));
+				queue.add(Builder.withUrl("/processContractTrades").param("contract", contractid)
+						.param("time_threshold_minutes", "1").method(TaskOptions.Method.GET));
 			}
 			pm.close();
 
@@ -114,6 +99,7 @@ public class StoreClosingPrices extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();

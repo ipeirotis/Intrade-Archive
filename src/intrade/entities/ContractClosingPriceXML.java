@@ -12,27 +12,26 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class ContractClosingPriceXML implements
-		Comparable<ContractClosingPriceXML> {
+public class ContractClosingPriceXML implements Comparable<ContractClosingPriceXML> {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key key;
+	private Key			key;
 
-	private String contractid;
+	private String	contractid;
 
-	private Date date;
+	private Date		date;
 
-	private Long dt;
+	private Long		dt;
 
-	private Double high;
+	private Double	high;
 
-	private Double low;
+	private Double	low;
 
-	private Double price;
+	private Double	price;
 
-	public ContractClosingPriceXML(String contractid, Long dt, Double price,
-			Double low, Double high) {
+	public ContractClosingPriceXML(String contractid, Long dt, Double price, Double low, Double high) {
+
 		this.contractid = contractid;
 		this.date = new Date(dt);
 		this.dt = dt;
@@ -40,9 +39,7 @@ public class ContractClosingPriceXML implements
 		this.low = low;
 		this.high = high;
 
-		Key k = KeyFactory.createKey(
-				ContractClosingPriceXML.class.getSimpleName(), "id"
-						+ contractid + dt);
+		Key k = KeyFactory.createKey(ContractClosingPriceXML.class.getSimpleName(), "id" + contractid + dt);
 		this.setKey(k);
 
 	}
@@ -56,10 +53,10 @@ public class ContractClosingPriceXML implements
 	}
 
 	public boolean equals(Object o) {
+
 		if (o instanceof ContractClosingPriceXML) {
 			ContractClosingPriceXML c = (ContractClosingPriceXML) o;
-			if (c.getContractid().equals(contractid)
-					&& c.getDate().equals(date)) {
+			if (c.getContractid().equals(contractid) && c.getDate().equals(date)) {
 				return true;
 			}
 			return false;
@@ -68,36 +65,43 @@ public class ContractClosingPriceXML implements
 	}
 
 	public String getContractid() {
+
 		return contractid;
 	}
 
 	public Date getDate() {
+
 		return date;
 	}
 
 	public Long getDt() {
+
 		return dt;
 	}
 
 	public Double getHigh() {
+
 		return high;
 	}
 
 	public Double getLow() {
+
 		return low;
 	}
 
 	public Double getPrice() {
+
 		return price;
 	}
 
 	public void setKey(Key key) {
+
 		this.key = key;
 	}
 
 	public String toString() {
-		return "CP:(" + contractid + ',' + date + ',' + price + ',' + low + ','
-				+ high + ',' + dt + ")";
+
+		return "CP:(" + contractid + ',' + date + ',' + price + ',' + low + ',' + high + ',' + dt + ")";
 	}
 
 }

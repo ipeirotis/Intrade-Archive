@@ -25,20 +25,19 @@ import com.google.appengine.api.datastore.Blob;
 @SuppressWarnings("serial")
 public class ProcessContractClosingPrices extends HttpServlet {
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		doGet(req, resp);
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		try {
 			String contract = req.getParameter("contract");
 			if (contract != null) {
-				resp.getWriter().println(
-						"Storing closing prices for contract:" + contract);
+				resp.getWriter().println("Storing closing prices for contract:" + contract);
 			} else {
 				return;
 			}
@@ -79,8 +78,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 		}
 	}
 
-	private boolean fetchClosingPricesForContract(String contractid,
-			boolean setArchive) {
+	private boolean fetchClosingPricesForContract(String contractid, boolean setArchive) {
 
 		Blob b = storeCSVfile(contractid);
 		boolean fetchedCSV = fetchContractClosingPricesCSV(b, contractid);
@@ -98,8 +96,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 		}
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Contract stored_con = pm.getObjectById(Contract.class,
-				Contract.generateKeyFromID(contractid));
+		Contract stored_con = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 		if (setArchive) {
 			stored_con.setArchived(true);
 		} else {
@@ -112,8 +109,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 		if (setArchive) {
 			print("Processed and archived contract:" + stored_con.toString());
 		} else {
-			print("Processed (but not archived) contract:"
-					+ stored_con.toString());
+			print("Processed (but not archived) contract:" + stored_con.toString());
 		}
 		pm.close();
 
@@ -121,6 +117,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 	}
 
 	private Blob storeCSVfile(String id) {
+
 		Contract c = null;
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -137,6 +134,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();
@@ -155,9 +153,9 @@ public class ProcessContractClosingPrices extends HttpServlet {
 	 * line processed and we process only lines after that
 	 * 
 	 * @param csv
-	 *            The Blob object
+	 *          The Blob object
 	 * @param contractid
-	 *            The contract ID
+	 *          The contract ID
 	 * @return True if everything was processed without error. False is there
 	 *         was an error
 	 */
@@ -176,8 +174,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 			return true;
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Contract c = pm.getObjectById(Contract.class,
-				Contract.generateKeyFromID(contractid));
+		Contract c = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 		Integer limit = c.getLastLineInsertedCSV();
 		pm.close();
 
@@ -187,16 +184,14 @@ public class ProcessContractClosingPrices extends HttpServlet {
 		String[] entries = contractsCP.split("\n");
 
 		if (entries.length > 2)
-			print("Adding " + (entries.length - 1) + "entries, starting from "
-					+ limit + ", for contract " + contractid);
+			print("Adding " + (entries.length - 1) + "entries, starting from " + limit + ", for contract " + contractid);
 
 		ArrayList<ContractClosingPriceCSV> prices = new ArrayList<ContractClosingPriceCSV>();
 		for (int i = limit; i < entries.length; i++) {
 			if (entries[i].startsWith("Date"))
 				continue;
 
-			ContractClosingPriceCSV cp = parseContractClosingPriceCSV(
-					entries[i], contractid);
+			ContractClosingPriceCSV cp = parseContractClosingPriceCSV(entries[i], contractid);
 			prices.add(cp);
 
 			// Every 50 added prices, persist, update contract, and flush...
@@ -204,8 +199,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 			if (i % 50 == 0) {
 				pm = PMF.get().getPersistenceManager();
 				pm.makePersistentAll(prices);
-				Contract con = pm.getObjectById(Contract.class,
-						Contract.generateKeyFromID(contractid));
+				Contract con = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 				con.setLastLineInsertedCSV(i);
 				pm.close();
 				prices = new ArrayList<ContractClosingPriceCSV>();
@@ -216,8 +210,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 
 		pm = PMF.get().getPersistenceManager();
 		pm.makePersistentAll(prices);
-		Contract con = pm.getObjectById(Contract.class,
-				Contract.generateKeyFromID(contractid));
+		Contract con = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 		con.setLastLineInsertedCSV(entries.length - 1);
 		pm.close();
 
@@ -239,8 +232,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 	 * 
 	 * } this.lastFetchedClosingXML = (new Date()).getTime(); }
 	 */
-	private static ContractClosingPriceCSV parseContractClosingPriceCSV(
-			String l, String contract_id) {
+	private static ContractClosingPriceCSV parseContractClosingPriceCSV(String l, String contract_id) {
 
 		StreamTokenizer st = new StreamTokenizer(new StringReader(l));
 
@@ -256,8 +248,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 
 			String date_str = st.sval;
 			if (date_str != null) {
-				date = DateFormat.getDateInstance(DateFormat.MEDIUM).parse(
-						date_str);
+				date = DateFormat.getDateInstance(DateFormat.MEDIUM).parse(date_str);
 			} else {
 				return null;
 			}
@@ -306,20 +297,19 @@ public class ProcessContractClosingPrices extends HttpServlet {
 		}
 		Long volume = (long) st.nval;
 
-		ContractClosingPriceCSV cp = new ContractClosingPriceCSV(contract_id,
-				date.getTime(), open, low, high, close, volume);
+		ContractClosingPriceCSV cp = new ContractClosingPriceCSV(contract_id, date.getTime(), open, low, high, close,
+				volume);
 
 		return cp;
 	}
 
-	private static ContractClosingPriceXML parseContractClosingPriceXML(
-			Node cp, String contract_id) {
+	@SuppressWarnings("unused")
+	private static ContractClosingPriceXML parseContractClosingPriceXML(Node cp, String contract_id) {
 
 		String cp_dt_str = cp.getAttributes().getNamedItem("dt").getNodeValue();
 		Long cp_dt = Long.parseLong(cp_dt_str);
 
-		String cp_price_str = cp.getAttributes().getNamedItem("price")
-				.getNodeValue();
+		String cp_price_str = cp.getAttributes().getNamedItem("price").getNodeValue();
 		Double cp_price;
 		try {
 			cp_price = Double.parseDouble(cp_price_str);
@@ -327,8 +317,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 			cp_price = null;
 		}
 
-		String cp_high_str = cp.getAttributes().getNamedItem("sessionHi")
-				.getNodeValue();
+		String cp_high_str = cp.getAttributes().getNamedItem("sessionHi").getNodeValue();
 		Double cp_high;
 		try {
 			cp_high = Double.parseDouble(cp_high_str);
@@ -336,8 +325,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 			cp_high = null;
 		}
 
-		String cp_low_str = cp.getAttributes().getNamedItem("sessionLo")
-				.getNodeValue();
+		String cp_low_str = cp.getAttributes().getNamedItem("sessionLo").getNodeValue();
 		Double cp_low;
 		try {
 			cp_low = Double.parseDouble(cp_low_str);
@@ -345,8 +333,7 @@ public class ProcessContractClosingPrices extends HttpServlet {
 			cp_low = null;
 		}
 
-		ContractClosingPriceXML cpxml = new ContractClosingPriceXML(
-				contract_id, cp_dt, cp_price, cp_low, cp_high);
+		ContractClosingPriceXML cpxml = new ContractClosingPriceXML(contract_id, cp_dt, cp_price, cp_low, cp_high);
 
 		return cpxml;
 

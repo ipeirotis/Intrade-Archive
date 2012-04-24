@@ -17,6 +17,7 @@ import com.google.appengine.api.datastore.Query;
 
 @SuppressWarnings("serial")
 public class TruncateServlet extends HttpServlet {
+
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
 		String cl = req.getParameter("class");
@@ -26,8 +27,7 @@ public class TruncateServlet extends HttpServlet {
 		} catch (Exception e) {
 		}
 
-		DatastoreService datastore = DatastoreServiceFactory
-				.getDatastoreService();
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
 		Query q = new Query(cl);
 		ArrayList<Key> keys = new ArrayList<Key>();

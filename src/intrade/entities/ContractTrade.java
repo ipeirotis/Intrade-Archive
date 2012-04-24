@@ -16,21 +16,22 @@ public class ContractTrade implements Comparable<ContractTrade> {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key key;
+	private Key			key;
 
 	@Persistent
-	private String contractid;
+	private String	contractid;
 
 	@Persistent
-	private Long date;
+	private Long		date;
 
 	@Persistent
-	private Double price;
+	private Double	price;
 
 	@Persistent
-	private Long volume;
+	private Long		volume;
 
 	public ContractTrade(String contractid, Long date, Double price, Long volume) {
+
 		this.contractid = contractid;
 		this.date = date;
 		this.price = price;
@@ -42,13 +43,14 @@ public class ContractTrade implements Comparable<ContractTrade> {
 	}
 
 	public Double getPrice() {
+
 		return price;
 	}
 
-	public static Key generateKeyFromID(String contractid, Long date,
-			Double price, Long vol) {
-		return KeyFactory.createKey(ContractTrade.class.getSimpleName(), "id"
-				+ contractid + "-" + date + "-" + price + "-" + vol);
+	public static Key generateKeyFromID(String contractid, Long date, Double price, Long vol) {
+
+		return KeyFactory.createKey(ContractTrade.class.getSimpleName(), "id" + contractid + "-" + date + "-" + price + "-"
+				+ vol);
 	}
 
 	public int compareTo(ContractTrade p) {
@@ -72,10 +74,10 @@ public class ContractTrade implements Comparable<ContractTrade> {
 	}
 
 	public boolean equals(Object o) {
+
 		if (o instanceof ContractTrade) {
 			ContractTrade c = (ContractTrade) o;
-			if (c.getContractid().equals(contractid)
-					&& c.getDate().equals(date)) {
+			if (c.getContractid().equals(contractid) && c.getDate().equals(date)) {
 				return true;
 			}
 			return false;
@@ -84,32 +86,35 @@ public class ContractTrade implements Comparable<ContractTrade> {
 	}
 
 	public String getContractid() {
+
 		return contractid;
 	}
 
 	public Long getDate() {
+
 		return date;
 	}
 
 	public Key getKey() {
+
 		return key;
 	}
 
 	public Long getVolume() {
+
 		return volume;
 	}
 
 	public void setKey(Key key) {
+
 		this.key = key;
 	}
 
 	public String toString() {
-		return "CPCSV:("
-				+ contractid
-				+ ','
-				+ DateFormat.getDateTimeInstance(DateFormat.FULL,
-						DateFormat.FULL).format(this.date) + ',' + this.price
-				+ ',' + this.volume + ")";
+
+		return "CPCSV:(" + contractid + ','
+				+ DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.date) + ',' + this.price + ','
+				+ this.volume + ")";
 	}
 
 }

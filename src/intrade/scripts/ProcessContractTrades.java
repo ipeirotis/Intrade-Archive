@@ -18,20 +18,19 @@ import com.google.appengine.api.datastore.Blob;
 @SuppressWarnings("serial")
 public class ProcessContractTrades extends HttpServlet {
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		doGet(req, resp);
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		try {
 			String contract = req.getParameter("contract");
 			if (contract != null) {
-				resp.getWriter().println(
-						"Storing closing prices for contract:" + contract);
+				resp.getWriter().println("Storing closing prices for contract:" + contract);
 			} else {
 				return;
 			}
@@ -68,8 +67,7 @@ public class ProcessContractTrades extends HttpServlet {
 		}
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Contract stored_con = pm.getObjectById(Contract.class,
-				Contract.generateKeyFromID(contractid));
+		Contract stored_con = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 
 		Long now = (new Date()).getTime();
 		if (fetchedTrades) {
@@ -82,6 +80,7 @@ public class ProcessContractTrades extends HttpServlet {
 	}
 
 	private Blob storeTradesfile(String id) {
+
 		Contract c = null;
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -98,6 +97,7 @@ public class ProcessContractTrades extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();
@@ -109,16 +109,13 @@ public class ProcessContractTrades extends HttpServlet {
 
 	/**
 	 * This routine parses the Blob that contains the actual CSV file and
-	 * generates the appropriate ContractClosingPricesCSV objects, which are
+	 * generates the appropriate ContractTrade objects, which are
 	 * then stored in the datastore of the Google App Engine.
 	 * 
-	 * Since big CSV files may take too much time to process, we keep the last
-	 * line processed and we process only lines after that
-	 * 
 	 * @param csv
-	 *            The Blob object
+	 *          The Blob object
 	 * @param contractid
-	 *            The contract ID
+	 *          The contract ID
 	 * @return True if everything was processed without error. False is there
 	 *         was an error
 	 */
@@ -133,8 +130,7 @@ public class ProcessContractTrades extends HttpServlet {
 
 		// We have the file, but there are no CSV data from Intrade. We just
 		// stop here...
-		if (trades.contains("An error has occurred")
-				|| trades.contains("No trades found")) {
+		if (trades.contains("An error has occurred") || trades.contains("No trades found")) {
 			print("No trades for contract " + contractid);
 			return true;
 		}
@@ -146,8 +142,7 @@ public class ProcessContractTrades extends HttpServlet {
 
 		String[] entries = trades.split("\n");
 
-		print("Adding " + (entries.length - 1) + " entries for contract "
-				+ contractid);
+		print("Adding " + (entries.length - 1) + " entries for contract " + contractid);
 
 		Long lastUTC = new Long(-1);
 		ArrayList<ContractTrade> prices = new ArrayList<ContractTrade>();
@@ -166,16 +161,14 @@ public class ProcessContractTrades extends HttpServlet {
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistentAll(prices);
-		Contract con = pm.getObjectById(Contract.class,
-				Contract.generateKeyFromID(contractid));
+		Contract con = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
 		con.setLastUTCInsertedTrades(lastUTC);
 		pm.close();
 
 		return true;
 	}
 
-	private static ContractTrade parseContractTradeCSV(String l,
-			String contract_id) {
+	private static ContractTrade parseContractTradeCSV(String l, String contract_id) {
 
 		String[] entries = l.split(",");
 
@@ -183,8 +176,7 @@ public class ProcessContractTrades extends HttpServlet {
 		Double price = Double.parseDouble(entries[2].trim());
 		Long volume = Long.parseLong(entries[3].trim());
 
-		ContractTrade ct = new ContractTrade(contract_id, timeStamp, price,
-				volume);
+		ContractTrade ct = new ContractTrade(contract_id, timeStamp, price, volume);
 
 		return ct;
 	}

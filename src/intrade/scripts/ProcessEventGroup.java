@@ -28,23 +28,23 @@ import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 @SuppressWarnings("serial")
 public class ProcessEventGroup extends HttpServlet {
 
-	public static String url = FetchMarketOverview.url;
+	public static String	url											= FetchMarketOverview.url;
 
-	public static int time_threshold_minutes = 180;
+	public static int			time_threshold_minutes	= 180;
 
 	private static int time_threshold() {
+
 		return time_threshold_minutes * 60 * 1000;
 	}
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		doGet(req, resp);
 	}
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		PersistenceManager pm = null;
 		try {
@@ -74,6 +74,12 @@ public class ProcessEventGroup extends HttpServlet {
 			{
 				resp.getWriter().println("Processing group " + eventgroup);
 			}
+			// Do not process the financial contracts for Dow Jones. We do not need
+			// prediction markets for financial events. They are too many in any case and add needless load
+			if (eventgroup.equals("4409")) { // 4409 is the Dow Jones code on Intrade
+				resp.getWriter().println("We skip the Dow Jones contracts.");
+				return;
+			}
 
 			String u = req.getParameter("url");
 			if (u != null) {
@@ -89,8 +95,7 @@ public class ProcessEventGroup extends HttpServlet {
 
 			MarketXML m = null;
 			try {
-				m = pm.getObjectById(MarketXML.class,
-						MarketXML.generateKeyFromID(url));
+				m = pm.getObjectById(MarketXML.class, MarketXML.generateKeyFromID(url));
 			} catch (Exception e) {
 				m = null;
 			}
@@ -101,8 +106,7 @@ public class ProcessEventGroup extends HttpServlet {
 				for (int i = 0; i < n.getLength(); i++) {
 					Node nd = n.item(i);
 
-					String group_id = nd.getAttributes().getNamedItem("id")
-							.getNodeValue();
+					String group_id = nd.getAttributes().getNamedItem("id").getNodeValue();
 					if (!group_id.equals(eventgroup))
 						continue;
 
@@ -126,11 +130,11 @@ public class ProcessEventGroup extends HttpServlet {
 	}
 
 	private long lastRetrieved_group(String group_id) {
+
 		EventGroup eventgroup = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			eventgroup = pm.getObjectById(EventGroup.class,
-					EventGroup.generateKeyFromID(group_id));
+			eventgroup = pm.getObjectById(EventGroup.class, EventGroup.generateKeyFromID(group_id));
 		} catch (Exception e) {
 			eventgroup = null;
 		}
@@ -148,8 +152,8 @@ public class ProcessEventGroup extends HttpServlet {
 	 */
 
 	private void storeEventGroup(Node eventGroup, String parentClassId) {
-		String group_id = eventGroup.getAttributes().getNamedItem("id")
-				.getNodeValue();
+
+		String group_id = eventGroup.getAttributes().getNamedItem("id").getNodeValue();
 
 		long now = (new Date()).getTime();
 		long lastretrieval = lastRetrieved_group(group_id);
@@ -178,15 +182,12 @@ public class ProcessEventGroup extends HttpServlet {
 
 		Queue queue = QueueFactory.getDefaultQueue();
 		for (Node event : events) {
-			String event_id = event.getAttributes().getNamedItem("id")
-					.getNodeValue();
-			queue.add(Builder.withUrl("/processEvent")
-					.method(TaskOptions.Method.GET).param("event", event_id));
+			String event_id = event.getAttributes().getNamedItem("id").getNodeValue();
+			queue.add(Builder.withUrl("/processEvent").method(TaskOptions.Method.GET).param("event", event_id));
 
 		}
 
-		EventGroup eg = new EventGroup(group_id, group_name,
-				group_displayorder, parentClassId);
+		EventGroup eg = new EventGroup(group_id, group_name, group_displayorder, parentClassId);
 		eg.setLastretrieved(now);
 		print("Storing:" + eg.toString());
 
@@ -199,6 +200,7 @@ public class ProcessEventGroup extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();

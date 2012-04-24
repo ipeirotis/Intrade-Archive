@@ -20,10 +20,10 @@ import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 @SuppressWarnings("serial")
 public class StoreTrades extends HttpServlet {
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 		try {
 			String t = req.getParameter("time_threshold_minutes");
 			// Integer threshold = Contract.getTrade_time_threshold_minutes();
@@ -44,26 +44,21 @@ public class StoreTrades extends HttpServlet {
 
 			// First get the expired contracts that have not been archived yet
 			// Get the prices and archive them
-			query = "SELECT FROM " + Contract.class.getName()
-					+ " WHERE archived==false ORDER BY lastretrievedTrades";
+			query = "SELECT FROM " + Contract.class.getName() + " WHERE archived==false ORDER BY lastretrievedTrades";
 			print(query);
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Query q = pm.newQuery(query);
-			q.setRange(0, 200);
+			// q.setRange(0, 2000);
 			Queue queue = QueueFactory.getDefaultQueue();
 			@SuppressWarnings("unchecked")
 			List<Contract> results = (List<Contract>) q.execute();
-			print("Putting in queue for processing " + results.size()
-					+ " contracts.");
+			print("Putting in queue for processing " + results.size() + " contracts.");
 			for (Contract c : results) {
 				String contractid = c.getId();
 				// print("Adding contract "+contractid+
 				// " in the queue. Will not archive.");
-				queue.add(Builder
-						.withUrl("/processContractTrades")
-						.param("contract", contractid)
-						.param("time_threshold_minutes",
-								"" + Contract.getTrade_time_threshold_minutes())
+				queue.add(Builder.withUrl("/processContractTrades").param("contract", contractid)
+						.param("time_threshold_minutes", "" + Contract.getTrade_time_threshold_minutes())
 						.method(TaskOptions.Method.GET));
 			}
 			pm.close();
@@ -77,6 +72,7 @@ public class StoreTrades extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();

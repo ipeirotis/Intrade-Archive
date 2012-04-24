@@ -1,6 +1,6 @@
 /*
  * Created on Mar 2, 2005
- *
+ * 
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
@@ -49,12 +49,11 @@ import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
  */
 public class Utilities {
 
-	private static final char c[] = { '<', '>', '&', '\"' };
-	private static final String expansion[] = { "&lt;", "&gt;", "&amp;",
-			"&quot;" };
+	private static final char		c[]					= { '<', '>', '&', '\"' };
+	private static final String	expansion[]	= { "&lt;", "&gt;", "&amp;", "&quot;" };
 
-	public static Document getThrottledURL(String url)
-			throws FactoryConfigurationError {
+	public static Document getThrottledURL(String url) throws FactoryConfigurationError {
+
 		byte[] page = null;
 
 		boolean done = false;
@@ -81,6 +80,7 @@ public class Utilities {
 	}
 
 	public static String cleanLine(String line) {
+
 		StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < line.length(); i++) {
 			char c1 = line.charAt(i);
@@ -94,6 +94,7 @@ public class Utilities {
 	}
 
 	public static String cleanForXML(String line) {
+
 		StringBuffer buffer = new StringBuffer();
 		for (int i = 0; i < line.length(); i++) {
 			char c1 = line.charAt(i);
@@ -107,6 +108,7 @@ public class Utilities {
 	}
 
 	public static TreeSet<String> getWords(String TextFile) {
+
 		TreeSet<String> result = new TreeSet<String>();
 		StringTokenizer st = new StringTokenizer(TextFile);
 		while (st.hasMoreTokens()) {
@@ -135,8 +137,7 @@ public class Utilities {
 			return null;
 
 		} catch (com.google.appengine.api.urlfetch.ResponseTooLargeException e) {
-			System.err
-					.println("Response Too Large Exception:" + e.getMessage());
+			System.err.println("Response Too Large Exception:" + e.getMessage());
 			e.printStackTrace();
 			return null;
 		} catch (com.google.apphosting.api.DeadlineExceededException e) {
@@ -146,16 +147,15 @@ public class Utilities {
 	}
 
 	public static String getPage(String URLName) {
+
 		StringBuffer buffer = new StringBuffer();
 
 		try {
 			URL url = new URL(URLName);
 
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String line;
 
 			while ((line = reader.readLine()) != null) {
@@ -175,8 +175,7 @@ public class Utilities {
 			return null;
 
 		} catch (com.google.appengine.api.urlfetch.ResponseTooLargeException e) {
-			System.err
-					.println("Response Too Large Exception:" + e.getMessage());
+			System.err.println("Response Too Large Exception:" + e.getMessage());
 			e.printStackTrace();
 			return null;
 		}
@@ -185,6 +184,7 @@ public class Utilities {
 	}
 
 	public static void sleep(int secs) {
+
 		try {
 			Thread.sleep(secs * 1000);
 		} catch (InterruptedException e) {
@@ -202,13 +202,11 @@ public class Utilities {
 	 * @return the XML in-memory representation of the string
 	 * @throws FactoryConfigurationError
 	 */
-	public static Document getXMLFromString(byte[] file)
-			throws FactoryConfigurationError {
+	public static Document getXMLFromString(byte[] file) throws FactoryConfigurationError {
 
 		Document MIQuery = null;
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			// factory.setValidating(true);
 			// Amazon does not put a DTD
 			factory.setValidating(false);
@@ -222,17 +220,14 @@ public class Utilities {
 				// ignore fatal errors (an exception is guaranteed)
 				public void fatalError(SAXParseException exception) {
 
-					System.out.println("** Error" + ", line "
-							+ exception.getLineNumber() + ", uri "
-							+ exception.getSystemId());
+					System.out.println("** Error" + ", line " + exception.getLineNumber() + ", uri " + exception.getSystemId());
 					System.out.println("   " + exception.getMessage());
 				}
 
 				// treat validation errors as fatal
 				public void error(SAXParseException e) throws SAXParseException {
 
-					System.out.println("** Error" + ", line "
-							+ e.getLineNumber() + ", uri " + e.getSystemId());
+					System.out.println("** Error" + ", line " + e.getLineNumber() + ", uri " + e.getSystemId());
 					System.out.println("   " + e.getMessage());
 					throw e;
 				}
@@ -240,14 +235,11 @@ public class Utilities {
 				// dump warnings too
 				public void warning(SAXParseException err) {
 
-					System.out.println("** Warning" + ", line "
-							+ err.getLineNumber() + ", uri "
-							+ err.getSystemId());
+					System.out.println("** Warning" + ", line " + err.getLineNumber() + ", uri " + err.getSystemId());
 					System.out.println("   " + err.getMessage());
 				}
 			});
-			InputSource inputSource = new InputSource(new StringReader(
-					new String(file)));
+			InputSource inputSource = new InputSource(new StringReader(new String(file)));
 			MIQuery = builder.parse(inputSource);
 		} catch (SAXException sxe) {
 			// Error generated during parsing
@@ -282,8 +274,7 @@ public class Utilities {
 
 		Document MIQuery = null;
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			// factory.setValidating(true);
 			// Amazon does not put a DTD
 			factory.setValidating(false);
@@ -297,17 +288,14 @@ public class Utilities {
 				// ignore fatal errors (an exception is guaranteed)
 				public void fatalError(SAXParseException exception) {
 
-					System.out.println("** Error" + ", line "
-							+ exception.getLineNumber() + ", uri "
-							+ exception.getSystemId());
+					System.out.println("** Error" + ", line " + exception.getLineNumber() + ", uri " + exception.getSystemId());
 					System.out.println("   " + exception.getMessage());
 				}
 
 				// treat validation errors as fatal
 				public void error(SAXParseException e) throws SAXParseException {
 
-					System.out.println("** Error" + ", line "
-							+ e.getLineNumber() + ", uri " + e.getSystemId());
+					System.out.println("** Error" + ", line " + e.getLineNumber() + ", uri " + e.getSystemId());
 					System.out.println("   " + e.getMessage());
 					throw e;
 				}
@@ -315,9 +303,7 @@ public class Utilities {
 				// dump warnings too
 				public void warning(SAXParseException err) {
 
-					System.out.println("** Warning" + ", line "
-							+ err.getLineNumber() + ", uri "
-							+ err.getSystemId());
+					System.out.println("** Warning" + ", line " + err.getLineNumber() + ", uri " + err.getSystemId());
 					System.out.println("   " + err.getMessage());
 				}
 			});
@@ -335,6 +321,7 @@ public class Utilities {
 
 	// This method writes a DOM document to a file
 	public static void writeXmlFile(Document doc, String filename) {
+
 		try {
 			// Prepare the DOM document for writing
 			Source source = new DOMSource(doc);
@@ -344,8 +331,7 @@ public class Utilities {
 			Result result = new StreamResult(file);
 
 			// Write the DOM document to the file
-			Transformer xformer = TransformerFactory.newInstance()
-					.newTransformer();
+			Transformer xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 		} catch (TransformerConfigurationException e) {
 		} catch (TransformerException e) {
@@ -354,6 +340,7 @@ public class Utilities {
 
 	// This method writes a DOM document to a file
 	public static void writeXmlFile(Document doc, File file) {
+
 		try {
 			// Prepare the DOM document for writing
 			Source source = new DOMSource(doc);
@@ -362,8 +349,7 @@ public class Utilities {
 			Result result = new StreamResult(file);
 
 			// Write the DOM document to the file
-			Transformer xformer = TransformerFactory.newInstance()
-					.newTransformer();
+			Transformer xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 		} catch (TransformerConfigurationException e) {
 		} catch (TransformerException e) {
@@ -382,8 +368,7 @@ public class Utilities {
 			Result result = new StreamResult(sw);
 
 			// Write the DOM document to the file
-			Transformer xformer = TransformerFactory.newInstance()
-					.newTransformer();
+			Transformer xformer = TransformerFactory.newInstance().newTransformer();
 			xformer.transform(source, result);
 		} catch (TransformerConfigurationException e) {
 		} catch (TransformerException e) {
@@ -393,6 +378,7 @@ public class Utilities {
 	}
 
 	public static String httpget(String url) {
+
 		try {
 			StringBuffer sb = new StringBuffer();
 			URL href = new URL(url);
@@ -418,6 +404,7 @@ public class Utilities {
 	}
 
 	public static String HTMLEncode(String s) {
+
 		StringBuffer st = new StringBuffer();
 		for (int i = 0; i < s.length(); i++) {
 			boolean copy = true;

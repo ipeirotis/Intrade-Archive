@@ -26,12 +26,11 @@ import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 @SuppressWarnings("serial")
 public class FetchMarketOverview extends HttpServlet {
 
-	public static String url = "http://pages.stern.nyu.edu/~panos/intrade/intrade.xml";
+	public static String	url	= "http://pages.stern.nyu.edu/~panos/intrade/intrade.xml";
 
 	// public static String url = "http://pages.stern.nyu.edu/~panos/test2.xml";
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		resp.setContentType("text/plain");
 
@@ -68,18 +67,10 @@ public class FetchMarketOverview extends HttpServlet {
 			resp.getWriter().println("Checking if URL is fetched: " + url);
 			m = pm.getObjectById(MarketXML.class, k);
 			resp.getWriter().println("It is fetched...");
-			resp.getWriter().println(
-					"----------------------------------------------------");
-			resp.getWriter().println(
-					"Current timestamp:"
-							+ DateFormat.getDateTimeInstance().format(
-									m.getTimestamp()));
-			resp.getWriter().println(
-					"Last retrieved:"
-							+ DateFormat.getDateTimeInstance().format(
-									m.getLastretrieved()));
-			resp.getWriter().println(
-					"----------------------------------------------------");
+			resp.getWriter().println("----------------------------------------------------");
+			resp.getWriter().println("Current timestamp:" + DateFormat.getDateTimeInstance().format(m.getTimestamp()));
+			resp.getWriter().println("Last retrieved:" + DateFormat.getDateTimeInstance().format(m.getLastretrieved()));
+			resp.getWriter().println("----------------------------------------------------");
 			Long last = m.getLastretrieved();
 
 			// It is fetched. Refresh it.
@@ -88,26 +79,16 @@ public class FetchMarketOverview extends HttpServlet {
 			m.refresh();
 
 			if (m.getLastretrieved() == last) {
-				resp.getWriter()
-						.println(
-								"Not enough time passed since last retrieval. Current limit is "
-										+ MarketXML.time_threshold_minutes
-										+ " minutes");
+				resp.getWriter().println(
+						"Not enough time passed since last retrieval. Current limit is " + MarketXML.time_threshold_minutes
+								+ " minutes");
 			} else {
 				resp.getWriter().println("Got new copy");
 			}
-			resp.getWriter().println(
-					"----------------------------------------------------");
-			resp.getWriter().println(
-					"New timestamp:"
-							+ DateFormat.getDateTimeInstance().format(
-									m.getTimestamp()));
-			resp.getWriter().println(
-					"New retrieval:"
-							+ DateFormat.getDateTimeInstance().format(
-									m.getLastretrieved()));
-			resp.getWriter().println(
-					"----------------------------------------------------");
+			resp.getWriter().println("----------------------------------------------------");
+			resp.getWriter().println("New timestamp:" + DateFormat.getDateTimeInstance().format(m.getTimestamp()));
+			resp.getWriter().println("New retrieval:" + DateFormat.getDateTimeInstance().format(m.getLastretrieved()));
+			resp.getWriter().println("----------------------------------------------------");
 
 		} catch (Exception e) {
 			// URL not fetched before
@@ -121,10 +102,7 @@ public class FetchMarketOverview extends HttpServlet {
 
 			m.fetch();
 
-			resp.getWriter().println(
-					"New timestamp:"
-							+ DateFormat.getDateTimeInstance().format(
-									m.getTimestamp()));
+			resp.getWriter().println("New timestamp:" + DateFormat.getDateTimeInstance().format(m.getTimestamp()));
 			resp.getWriter().println("Storing...");
 			resp.getWriter().flush();
 			pm.makePersistent(m);
@@ -139,12 +117,9 @@ public class FetchMarketOverview extends HttpServlet {
 		for (int i = 0; i < n.getLength(); i++) {
 
 			Node nd = n.item(i);
-			String event_id = nd.getAttributes().getNamedItem("id")
-					.getNodeValue();
+			String event_id = nd.getAttributes().getNamedItem("id").getNodeValue();
 			resp.getWriter().println("Adding in queue EventClass:" + event_id);
-			queue.add(Builder.withUrl("/processEventClass")
-					.method(TaskOptions.Method.GET)
-					.param("eventclass", event_id));
+			queue.add(Builder.withUrl("/processEventClass").method(TaskOptions.Method.GET).param("eventclass", event_id));
 		}
 
 		resp.getWriter().println("Done!");

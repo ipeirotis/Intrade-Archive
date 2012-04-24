@@ -22,37 +22,41 @@ import com.google.appengine.api.datastore.KeyFactory;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class MarketXML {
 
-	public static int time_threshold_minutes = 15;
+	public static int	time_threshold_minutes	= 15;
 
 	private static int time_threshold() {
+
 		return time_threshold_minutes * 60 * 1000;
 	}
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-	private Key key;
+	private Key																			key;
 
 	@Persistent
-	private String URL;
+	private String																	URL;
 
 	@Persistent
-	private com.google.appengine.api.datastore.Blob filecontent;
+	private com.google.appengine.api.datastore.Blob	filecontent;
 
 	@Persistent
-	private Long timestamp = new Long(-1);
+	private Long																		timestamp			= new Long(-1);
 
 	@Persistent
-	private Long lastretrieved = new Long(-1);
+	private Long																		lastretrieved	= new Long(-1);
 
 	public Long getLastretrieved() {
+
 		return lastretrieved;
 	}
 
 	public void setLastretrieved(Long lastretrieved) {
+
 		this.lastretrieved = lastretrieved;
 	}
 
 	public MarketXML(String URL) {
+
 		this.URL = URL;
 
 		Key k = generateKeyFromID(URL);
@@ -61,6 +65,7 @@ public class MarketXML {
 	}
 
 	public static Key generateKeyFromID(String URL) {
+
 		return KeyFactory.createKey(MarketXML.class.getSimpleName(), URL);
 	}
 
@@ -82,10 +87,12 @@ public class MarketXML {
 	}
 
 	public Key getKey() {
+
 		return key;
 	}
 
 	private Long getMarketTime(Document d) {
+
 		NodeList nl_time = d.getElementsByTagName("MarketData");
 
 		if (nl_time.getLength() != 1) {
@@ -94,8 +101,7 @@ public class MarketXML {
 
 		try {
 			Node nd_marketdata = nl_time.item(0);
-			Long time = Long.parseLong(nd_marketdata.getAttributes()
-					.getNamedItem("intrade.timestamp").getNodeValue());
+			Long time = Long.parseLong(nd_marketdata.getAttributes().getNamedItem("intrade.timestamp").getNodeValue());
 			return time;
 		} catch (Exception e) {
 			return (long) 0;
@@ -104,14 +110,17 @@ public class MarketXML {
 	}
 
 	public Long getTimestamp() {
+
 		return timestamp;
 	}
 
 	public String getURL() {
+
 		return URL;
 	}
 
 	public Document getXML() {
+
 		if (filecontent != null) {
 			Document d = Utilities.getXMLFromString(filecontent.getBytes());
 			return d;
@@ -120,19 +129,17 @@ public class MarketXML {
 	}
 
 	public void refresh() {
+
 		Long now = (new Date()).getTime();
 
 		System.out.println("Now:" + now);
-		System.out.println("Now:"
-				+ DateFormat.getDateTimeInstance().format(now));
+		System.out.println("Now:" + DateFormat.getDateTimeInstance().format(now));
 
 		System.out.println("Last retrieved:" + this.lastretrieved);
-		System.out.println("Last retrieved:"
-				+ DateFormat.getDateTimeInstance().format(this.lastretrieved));
+		System.out.println("Last retrieved:" + DateFormat.getDateTimeInstance().format(this.lastretrieved));
 
 		System.out.println("File:" + this.timestamp);
-		System.out.println("File:"
-				+ DateFormat.getDateTimeInstance().format(this.timestamp));
+		System.out.println("File:" + DateFormat.getDateTimeInstance().format(this.timestamp));
 
 		System.out.println("Diff:" + (now - this.lastretrieved));
 
@@ -146,18 +153,22 @@ public class MarketXML {
 	}
 
 	public void setKey(Key key) {
+
 		this.key = key;
 	}
 
 	public void setTimestamp(Long timestamp) {
+
 		this.timestamp = timestamp;
 	}
 
 	public void setURL(String url) {
+
 		URL = url;
 	}
 
 	public String toString() {
+
 		return "URL:(" + URL + ',' + timestamp + ")";
 	}
 

@@ -26,18 +26,18 @@ import org.w3c.dom.NodeList;
 @SuppressWarnings("serial")
 public class StoreContracts extends HttpServlet {
 
-	public static String url = FetchMarketOverview.url;
+	public static String	url											= FetchMarketOverview.url;
 
-	public static int time_threshold_minutes = 180;
+	public static int			time_threshold_minutes	= 180;
 
 	private static int time_threshold() {
+
 		return time_threshold_minutes * 60 * 1000;
 	}
 
-	private HttpServletResponse r;
+	private HttpServletResponse	r;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException {
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 		PersistenceManager pm = null;
 		try {
@@ -56,13 +56,20 @@ public class StoreContracts extends HttpServlet {
 			}
 
 			String eventclass = req.getParameter("eventclass");
+
 			if (eventclass != null) {
 				resp.getWriter().println("Processing class " + eventclass);
 			}
 
 			String eventgroup = req.getParameter("eventgroup");
-			if (eventclass != null) {
+			if (eventgroup != null) {
 				resp.getWriter().println("Processing group " + eventgroup);
+			}
+			// Do not process the financial contracts for Dow Jones. We do not need
+			// prediction markets for financial events. They are too many in any case and add needless load
+			if (eventgroup.equals("4409")) { // 4409 is the Dow Jones code on Intrade
+				resp.getWriter().println("We skip the Dow Jones contracts.");
+				return;
 			}
 
 			String u = req.getParameter("url");
@@ -79,8 +86,7 @@ public class StoreContracts extends HttpServlet {
 
 			MarketXML m = null;
 			try {
-				m = pm.getObjectById(MarketXML.class,
-						MarketXML.generateKeyFromID(url));
+				m = pm.getObjectById(MarketXML.class, MarketXML.generateKeyFromID(url));
 			} catch (Exception e) {
 				m = null;
 			}
@@ -110,11 +116,11 @@ public class StoreContracts extends HttpServlet {
 	}
 
 	private long lastRetrieved_eventclass(String event_id) {
+
 		EventClass eventclass = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			eventclass = pm.getObjectById(EventClass.class,
-					EventClass.generateKeyFromID(event_id));
+			eventclass = pm.getObjectById(EventClass.class, EventClass.generateKeyFromID(event_id));
 		} catch (Exception e) {
 			eventclass = null;
 		}
@@ -123,11 +129,11 @@ public class StoreContracts extends HttpServlet {
 	}
 
 	private long lastRetrieved_group(String group_id) {
+
 		EventGroup eventgroup = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			eventgroup = pm.getObjectById(EventGroup.class,
-					EventGroup.generateKeyFromID(group_id));
+			eventgroup = pm.getObjectById(EventGroup.class, EventGroup.generateKeyFromID(group_id));
 		} catch (Exception e) {
 			eventgroup = null;
 		}
@@ -136,12 +142,12 @@ public class StoreContracts extends HttpServlet {
 	}
 
 	private long lastRetrieved_event(String event_id) {
+
 		Event event = null;
 
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			event = pm.getObjectById(Event.class,
-					Event.generateKeyFromID(event_id));
+			event = pm.getObjectById(Event.class, Event.generateKeyFromID(event_id));
 		} catch (Exception e) {
 			event = null;
 		}
@@ -149,22 +155,15 @@ public class StoreContracts extends HttpServlet {
 		return (event == null) ? 0 : event.getLastretrieved();
 	}
 
-	private Contract parseContract(Node contract, String eventid, Long start,
-			Long end) {
-		String contract_id = contract.getAttributes().getNamedItem("id")
-				.getNodeValue();
-		String contract_ccy = contract.getAttributes().getNamedItem("ccy")
-				.getNodeValue();
-		String contract_inRunning = contract.getAttributes()
-				.getNamedItem("inRunning").getNodeValue();
-		String contract_state = contract.getAttributes().getNamedItem("state")
-				.getNodeValue();
-		String contract_tickSize = contract.getAttributes()
-				.getNamedItem("tickSize").getNodeValue();
-		String contract_tickValue = contract.getAttributes()
-				.getNamedItem("tickValue").getNodeValue();
-		String contract_type = contract.getAttributes().getNamedItem("type")
-				.getNodeValue();
+	private Contract parseContract(Node contract, String eventid, Long start, Long end) {
+
+		String contract_id = contract.getAttributes().getNamedItem("id").getNodeValue();
+		String contract_ccy = contract.getAttributes().getNamedItem("ccy").getNodeValue();
+		String contract_inRunning = contract.getAttributes().getNamedItem("inRunning").getNodeValue();
+		String contract_state = contract.getAttributes().getNamedItem("state").getNodeValue();
+		String contract_tickSize = contract.getAttributes().getNamedItem("tickSize").getNodeValue();
+		String contract_tickValue = contract.getAttributes().getNamedItem("tickValue").getNodeValue();
+		String contract_type = contract.getAttributes().getNamedItem("type").getNodeValue();
 
 		String contract_name = "";
 		String contract_symbol = "";
@@ -184,25 +183,20 @@ public class StoreContracts extends HttpServlet {
 			} else if (nd_name.equals("totalVolume")) {
 				contract_totalVolume = nd.getTextContent();
 			} else if (nd_name.equals("date")) {
-				if (nd.getAttributes().getNamedItem("name").getNodeValue()
-						.equals("expiryDate")) {
+				if (nd.getAttributes().getNamedItem("name").getNodeValue().equals("expiryDate")) {
 
-					contract_expiryDate = nd.getAttributes()
-							.getNamedItem("val").getNodeValue();
+					contract_expiryDate = nd.getAttributes().getNamedItem("val").getNodeValue();
 				} else {
-					System.err.println("Found unexpected date type:"
-							+ nd.getAttributes().getNamedItem("name")
-									.getNodeValue());
+					System.err.println("Found unexpected date type:" + nd.getAttributes().getNamedItem("name").getNodeValue());
 				}
 			} else if (nd_name.equals("expiryPrice")) {
 				contract_expiryPrice = nd.getTextContent();
 			}
 		}
 
-		Contract con = new Contract(contract_id, eventid, contract_name,
-				contract_symbol, contract_totalVolume, contract_ccy,
-				contract_inRunning, contract_state, contract_tickSize,
-				contract_tickValue, contract_type, start, end);
+		Contract con = new Contract(contract_id, eventid, contract_name, contract_symbol, contract_totalVolume,
+				contract_ccy, contract_inRunning, contract_state, contract_tickSize, contract_tickValue, contract_type, start,
+				end);
 
 		if (contract_expiryDate != null) {
 			con.setExpiryDate(Long.parseLong(contract_expiryDate));
@@ -215,8 +209,7 @@ public class StoreContracts extends HttpServlet {
 		return con;
 	}
 
-	private long storeContracts(Node contract, String eventid, Long start,
-			Long end) {
+	private long storeContracts(Node contract, String eventid, Long start, Long end) {
 
 		long now = (new Date()).getTime();
 
@@ -226,8 +219,7 @@ public class StoreContracts extends HttpServlet {
 		Contract stored_contract = null;
 
 		try {
-			stored_contract = pm.getObjectById(Contract.class,
-					Contract.generateKeyFromID(con.getId()));
+			stored_contract = pm.getObjectById(Contract.class, Contract.generateKeyFromID(con.getId()));
 		} catch (Exception e) {
 			stored_contract = null;
 		}
@@ -244,8 +236,7 @@ public class StoreContracts extends HttpServlet {
 
 	}
 
-	private long storeEventClasses(Node nd, String classid_toprocess,
-			String groupid_toprocess) {
+	private long storeEventClasses(Node nd, String classid_toprocess, String groupid_toprocess) {
 
 		String event_id = nd.getAttributes().getNamedItem("id").getNodeValue();
 
@@ -304,10 +295,9 @@ public class StoreContracts extends HttpServlet {
 
 	}
 
-	private long storeEventGroups(Node eventGroup, String parentClassId,
-			String groupid_toprocess) {
-		String group_id = eventGroup.getAttributes().getNamedItem("id")
-				.getNodeValue();
+	private long storeEventGroups(Node eventGroup, String parentClassId, String groupid_toprocess) {
+
+		String group_id = eventGroup.getAttributes().getNamedItem("id").getNodeValue();
 
 		// If there is a specified condition for which group to process...
 		if (groupid_toprocess != null) {
@@ -352,8 +342,7 @@ public class StoreContracts extends HttpServlet {
 
 		}
 
-		EventGroup eg = new EventGroup(group_id, group_name,
-				group_displayorder, parentClassId);
+		EventGroup eg = new EventGroup(group_id, group_name, group_displayorder, parentClassId);
 		eg.setLastretrieved(oldest_updatetime);
 		print("Storing:" + eg.toString());
 
@@ -366,6 +355,7 @@ public class StoreContracts extends HttpServlet {
 	}
 
 	private void print(String message) {
+
 		try {
 			r.getWriter().println(message);
 			r.getWriter().flush();
@@ -386,12 +376,9 @@ public class StoreContracts extends HttpServlet {
 			return lastretrieval;
 		}
 
-		String event_gid = nd.getAttributes().getNamedItem("groupID")
-				.getNodeValue();
-		String event_start = nd.getAttributes().getNamedItem("StartDate")
-				.getNodeValue();
-		String event_end = nd.getAttributes().getNamedItem("EndDate")
-				.getNodeValue();
+		String event_gid = nd.getAttributes().getNamedItem("groupID").getNodeValue();
+		String event_start = nd.getAttributes().getNamedItem("StartDate").getNodeValue();
+		String event_end = nd.getAttributes().getNamedItem("EndDate").getNodeValue();
 
 		String event_name = "";
 		String event_displayorder = "";
@@ -423,8 +410,7 @@ public class StoreContracts extends HttpServlet {
 			}
 		}
 
-		Event ev = new Event(event_id, event_gid, event_name,
-				event_displayorder, event_description, start, end);
+		Event ev = new Event(event_id, event_gid, event_name, event_displayorder, event_description, start, end);
 		ev.setLastretrieved(oldest_updatetime);
 		print("Storing:" + ev.toString());
 
