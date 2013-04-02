@@ -39,7 +39,7 @@ String eid = request.getParameter("event");
    for (Contract c: contracts) {
 %>
 <tr>
-<td><%=c.getSymbol()%> <a href="/contract.jsp?contract=<%= c.getId() %>">Closing Prices</a>, <a href="/trades.jsp?contract=<%= c.getId() %>">Trades</a></td>
+<td><%=c.getSymbol()%> <a href="/contract.jsp?contract=<%= c.getId() %>">Closing Prices</a>, <a href="/trades.jsp?contract=<%= c.getId() %>&start=0&end=1000"">Trades</a></td>
 <td><%= c.getName() %></a></td>
 <td><%= java.text.DateFormat.getDateTimeInstance().format(c.getStartDate()) %></td>
 <td><%= java.text.DateFormat.getDateTimeInstance().format(c.getEndDate()) %></td>

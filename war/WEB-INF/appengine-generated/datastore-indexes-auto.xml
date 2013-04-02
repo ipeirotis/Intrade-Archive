@@ -1,6 +1,37 @@
-<!-- Indices written at Thu, 19 Apr 2012 15:05:42 EDT -->
+<!-- Indices written at Sun, 26 Aug 2012 23:38:26 EEST -->
 
 <datastore-indexes>
+
+    <!-- Used 66 times in query history -->
+    <datastore-index kind="ContractClosingPriceCSV" ancestor="false" source="auto">
+        <property name="contractid" direction="asc"/>
+        <property name="date" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 4 times in query history -->
+    <datastore-index kind="Contract" ancestor="false" source="auto">
+        <property name="archived" direction="asc"/>
+        <property name="expiryDate" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 4 times in query history -->
+    <datastore-index kind="Contract" ancestor="false" source="auto">
+        <property name="archived" direction="asc"/>
+        <property name="expiryDate" direction="asc"/>
+        <property name="laststoredCSV" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 3 times in query history -->
+    <datastore-index kind="EventGroup" ancestor="false" source="auto">
+        <property name="eventClassId" direction="asc"/>
+        <property name="displayOrder" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 9 times in query history -->
+    <datastore-index kind="Event" ancestor="false" source="auto">
+        <property name="groupId" direction="asc"/>
+        <property name="displayOrder" direction="asc"/>
+    </datastore-index>
 
     <!-- Used 1 time in query history -->
     <datastore-index kind="Contract" ancestor="false" source="auto">
@@ -8,7 +39,7 @@
         <property name="lastretrievedTrades" direction="asc"/>
     </datastore-index>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 11 times in query history -->
     <datastore-index kind="ContractTrade" ancestor="false" source="auto">
         <property name="contractid" direction="asc"/>
         <property name="date" direction="desc"/>

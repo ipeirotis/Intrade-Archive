@@ -18,16 +18,31 @@
 String contractid = request.getParameter("id");
 if (contractid == null)		return;
 
+int s = 0;
+String start = request.getParameter("start");
+if (start != null) {
+	s=Integer.parseInt(start);
+}
+
+int e = 1000;
+String end = request.getParameter("end");
+if (end != null) {
+	e=Integer.parseInt(end);
+}
+
 PersistenceManager pm = PMF.get().getPersistenceManager();
 Contract c;
 try {
 	c = pm.getObjectById(Contract.class, Contract.generateKeyFromID(contractid));
-} catch (Exception e) {
+} catch (Exception ex) {
 	return;
 }
 
-String query = "select from " + ContractTrade.class.getName() + " where contractid==\""+contractid+"\"";
-List<ContractTrade> trades = (List<ContractTrade>) pm.newQuery(query).execute();
+String query = "select from " + ContractTrade.class.getName() + " where contractid==\""+contractid+"\"  order by date DESC";
+
+Query q = pm.newQuery(query);
+q.setRange(s, e);
+List<ContractTrade> trades = (List<ContractTrade>)q.execute();
 if (trades.isEmpty()) return;
 
 String vol = request.getParameter("volume");

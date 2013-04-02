@@ -84,7 +84,7 @@ public class ProcessEvent extends HttpServlet {
 				m = null;
 			}
 			if (m != null) {
-				System.out.println(m.getURL());
+				//System.out.println(m.getURL());
 				Document d = m.getXML();
 				NodeList n = d.getElementsByTagName("Event");
 				for (int i = 0; i < n.getLength(); i++) {

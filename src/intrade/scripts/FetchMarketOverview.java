@@ -26,9 +26,7 @@ import com.google.appengine.api.taskqueue.TaskOptions.Builder;
 @SuppressWarnings("serial")
 public class FetchMarketOverview extends HttpServlet {
 
-	public static String	url	= "http://pages.stern.nyu.edu/~panos/intrade/intrade.xml";
-
-	// public static String url = "http://pages.stern.nyu.edu/~panos/test2.xml";
+	public static String	url	= "http://api.intrade.com/jsp/XML/MarketData/xml.jsp";
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
