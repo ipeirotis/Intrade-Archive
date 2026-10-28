@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+type: dataset
+message: "Please cite this dataset and record the release tag or commit used."
+title: "Intrade Historical Archive"
+authors:
+  - family-names: Ipeirotis
+    given-names: Panos
+    affiliation: "New York University, Stern School of Business"
+version: 1.0.0
+date-released: 2026-10-28
+url: "https://github.com/ipeirotis/Intrade-Archive"
+repository-code: "https://github.com/ipeirotis/Intrade-Archive"
+abstract: "Historical Intrade contract metadata, daily market summaries and trade records, with preserved source archives, explicit coverage limitations, reproducible research exports and a searchable static explorer."
+keywords:
+  - prediction markets
+  - Intrade
+  - historical data
+  - forecasting
