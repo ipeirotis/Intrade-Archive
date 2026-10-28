@@ -2,7 +2,6 @@ name: Build and validate archive
 on:
   push:
     branches: [master, archive-modernization]
-  pull_request:
   workflow_dispatch:
 permissions:
   contents: read

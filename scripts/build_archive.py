@@ -26,13 +26,13 @@ HEADERS = {
     "trades": ["market id","market symbol","market name","trade quantity","trade price","date/time [utc]"],
     "closingPrice": ["Date","Open","Low","High","Close","Volume"],
 }
-DAILY_FIELDS = ["contract_id","date","open","high","low","close","volume","open_interest","lifetime_high","lifetime_low","source_type","source_file_id","source_row"]
-TRADE_FIELDS = ["contract_id","timestamp_utc","price","quantity","duplicate_candidate","source_file_id","source_row"]
+DAILY_FIELDS = ["contract_id","date","open","high","low","close","volume","open_interest","lifetime_high","lifetime_low","source_type","source_name_comma_repair","source_file_id","source_row"]
+TRADE_FIELDS = ["contract_id","timestamp_utc","price","quantity","duplicate_candidate","source_name_comma_repair","source_file_id","source_row"]
 F64 = {"open","high","low","close","price","lifetime_high","lifetime_low"}
 I64 = {"volume","open_interest","quantity","source_file_id","source_row"}
 SCHEMAS = {}
 for name, cols in [("daily", DAILY_FIELDS), ("trades", TRADE_FIELDS)]:
-    SCHEMAS[name] = pa.schema([(c, pa.float64() if c in F64 else pa.int64() if c in I64 else pa.bool_() if c=="duplicate_candidate" else pa.string()) for c in cols])
+    SCHEMAS[name] = pa.schema([(c, pa.float64() if c in F64 else pa.int64() if c in I64 else pa.bool_() if c in {"duplicate_candidate","source_name_comma_repair"} else pa.string()) for c in cols])
 
 def json_write(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,11 +72,16 @@ def parse_member(raw, kind, cid, source_id):
     if header != HEADERS[kind]: raise ValueError(f"Unexpected {kind} header: {header}")
     result=[]
     for rowno, r in enumerate(reader, 2):
+        repaired = False
+        if kind != "closingPrice" and len(r) > len(header):
+            tail = 9 if kind == "summary" else 3
+            r = r[:2] + [",".join(r[2:-tail])] + r[-tail:]
+            repaired = True
         if len(r) != len(header): raise ValueError(f"Wrong column count at record {rowno}: {r}")
         row = dict(zip(header,r))
         if kind != "closingPrice" and str(int(row["market id"])) != cid:
             raise ValueError(f"Contract ID mismatch at record {rowno}")
-        provenance = dict(contract_id=cid, source_file_id=source_id, source_row=rowno)
+        provenance = dict(contract_id=cid, source_file_id=source_id, source_row=rowno, source_name_comma_repair=repaired)
         if kind == "trades":
             result.append(dict(provenance, timestamp_utc=date_value(r[5],kind),price=number(r[4]),quantity=number(r[3],True),duplicate_candidate=False))
         else:
@@ -183,7 +188,7 @@ def main():
             cid,kind=match.groups()
             if cid not in contracts: raise ValueError("Missing metadata for "+cid)
             sid=len(file_manifest)+1
-            file_manifest.append(dict(source_file_id=sid,archive=p.name,member=info.filename,contract_id=cid,source_type=kind,bytes=info.file_size,sha256=None,encoding=None,rows=None))
+            file_manifest.append(dict(source_file_id=sid,archive=p.name,member=info.filename,contract_id=cid,source_type=kind,bytes=info.file_size,sha256=None,encoding=None,rows=None,name_comma_repair_rows=None))
             members[cid].append((z,info,kind,sid))
     writers={n:TableWriter(n) for n in ["daily","trades"]}
     diagnostics=collections.Counter()
@@ -195,7 +200,7 @@ def main():
             raw=z.read(info)
             parsed,encoding=parse_member(raw,kind,cid,sid)
             fm=file_manifest[sid-1]
-            fm.update(sha256=hashlib.sha256(raw).hexdigest(),encoding=encoding,rows=len(parsed))
+            fm.update(sha256=hashlib.sha256(raw).hexdigest(),encoding=encoding,rows=len(parsed),name_comma_repair_rows=sum(r["source_name_comma_repair"] for r in parsed))
             (trades if kind=="trades" else daily).extend(parsed)
             original_entries.append((f"{sid}-{Path(info.filename).name}",raw))
         seen=collections.Counter((r["timestamp_utc"],r["price"],r["quantity"]) for r in trades)
@@ -212,9 +217,10 @@ def main():
         duplicate_dates=len(daily)-len(set((r["source_type"],r["date"]) for r in daily))
         overlap=len({r["date"] for r in summary}&{r["date"] for r in supplement})
         zero_volume=sum(r["volume"]==0 for r in daily)
+        repaired_count=sum(r["source_name_comma_repair"] for r in daily+trades)
         bad_price=sum(any(r[k] is not None and not 0<=r[k]<=100 for k in ["open","high","low","close"]) for r in daily)
         bad_price+=sum(r["price"] is not None and not 0<=r["price"]<=100 for r in trades)
-        row=dict(c,trade_status=trade_status,known_missing_trade_file=cid in missing,trade_rows=len(trades),summary_rows=len(summary),supplemental_daily_rows=len(supplement),daily_rows=len(daily),first_observed_date=min(observed_dates) if observed_dates else None,last_observed_date=max(observed_dates) if observed_dates else None,first_trade_utc=min(times) if times else None,last_trade_utc=max(times) if times else None,first_daily_date=min(days) if days else None,last_daily_date=max(days) if days else None,trade_count_mismatch=count_mismatch,summary_count_mismatch=summary_mismatch,duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,price_outside_0_100_rows=bad_price,source_file_ids=";".join(str(m[3]) for m in members[cid]))
+        row=dict(c,trade_status=trade_status,known_missing_trade_file=cid in missing,trade_rows=len(trades),summary_rows=len(summary),supplemental_daily_rows=len(supplement),daily_rows=len(daily),first_observed_date=min(observed_dates) if observed_dates else None,last_observed_date=max(observed_dates) if observed_dates else None,first_trade_utc=min(times) if times else None,last_trade_utc=max(times) if times else None,first_daily_date=min(days) if days else None,last_daily_date=max(days) if days else None,trade_count_mismatch=count_mismatch,summary_count_mismatch=summary_mismatch,duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,name_comma_repair_rows=repaired_count,price_outside_0_100_rows=bad_price,source_file_ids=";".join(str(m[3]) for m in members[cid]))
         coverage.append(row)
         diagnostics.update(trade_rows=len(trades),daily_rows=len(daily),summary_rows=len(summary),supplemental_daily_rows=len(supplement),duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,price_outside_0_100_rows=bad_price,contracts_with_trade_count_mismatch=int(count_mismatch),contracts_with_summary_count_mismatch=int(summary_mismatch))
         writers["daily"].add(daily);writers["trades"].add(trades)

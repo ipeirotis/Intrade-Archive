@@ -1,32 +1,39 @@
 import java.io.*;
 import java.util.*;
+/** Read-only filtered inspection; reports incomplete serialization without altering the file. */
 public class InspectDatastore {
-  static void walk(Object x, String path, int depth) {
-    System.out.println(path + " type=" + (x == null ? "null" : x.getClass().getName()));
-    if (x instanceof Map<?,?> m) {
-      System.out.println(path + " size=" + m.size());
-      int n=0;
-      for(var e:m.entrySet()) {
-        if(n++>=8) break;
-        walk(e.getValue(), path + "/" + e.getKey(), depth+1);
+  static class InspectInput extends ObjectInputStream {
+    long arrays=0,bytes=0;
+    Map<String,Long> types=new TreeMap<>();
+    InspectInput(InputStream in) throws IOException {super(in); enableResolveObject(true);}
+    protected Object resolveObject(Object x) {
+      if(x!=null)types.merge(x.getClass().getName(),1L,Long::sum);
+      if(x instanceof byte[] b) {
+        arrays++;bytes+=b.length;
+        if(arrays<=3)System.out.println("BYTE_ARRAY_SAMPLE length="+b.length+" prefix="+HexFormat.of().formatHex(Arrays.copyOf(b,Math.min(b.length,100))));
       }
-    } else if(x instanceof byte[] b) {
-      System.out.println(path+" bytes="+b.length+" prefix="+HexFormat.of().formatHex(Arrays.copyOf(b,Math.min(b.length,120))));
-    } else if(x instanceof Collection<?> c) {
-      System.out.println(path+" count="+c.size());
-      int n=0; for(var v:c) {if(n++>=2)break;walk(v,path+"/"+n,depth+1);}
-    } else if(x != null) System.out.println(path+" value="+x.toString().substring(0,Math.min(x.toString().length(),100)));
+      return x;
+    }
   }
   public static void main(String[] args) throws Exception {
-    try(var in=new ObjectInputStream(new FileInputStream(args[0]))) {
+    try(var in=new InspectInput(new FileInputStream(args[0]))) {
       in.setObjectInputFilter(info -> {
         var c=info.serialClass();
         if(info.depth()>1000 || info.references()>100000000 || info.arrayLength()>200000000) return ObjectInputFilter.Status.REJECTED;
         if(c==null || c.isPrimitive() || c.isArray() || c.getName().startsWith("java.util.") || c.getName().startsWith("java.lang.")) return ObjectInputFilter.Status.ALLOWED;
-        System.out.println("REJECTED_CLASS="+c.getName()); return ObjectInputFilter.Status.REJECTED;
+        return ObjectInputFilter.Status.REJECTED;
       });
-      System.out.println("VERSION="+in.readLong());
-      walk(in.readObject(),"root",0);
+      System.out.println("DATASTORE_VERSION="+in.readLong());
+      try {
+        Object root=in.readObject();
+        System.out.println("DATASTORE_STATUS=complete_top_level_object");
+        if(root instanceof Map<?,?> m)System.out.println("ROOT_KEYS="+m.keySet());
+      } catch(EOFException e) {
+        System.out.println("DATASTORE_STATUS=incomplete_serialized_stream");
+        System.out.println("The stream ended before its top-level object was complete. Preserve original bytes; no completeness claim is possible.");
+      }
+      System.out.println("COMPLETED_OBJECT_TYPES="+in.types);
+      System.out.println("COMPLETED_BYTE_ARRAYS="+in.arrays+" TOTAL_BYTES="+in.bytes);
     }
   }
 }

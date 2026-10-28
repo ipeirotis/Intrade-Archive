@@ -24,6 +24,11 @@ class ParsingTests(unittest.TestCase):
     def test_wrong_id_fails(self):
         raw=b'market id,market symbol,market name,trade quantity,trade price,date/time [utc]\n13,T,T,1,50,Jan/01/2010 00:00:00\n'
         with self.assertRaises(ValueError):parse_member(raw,"trades","12",1)
+    def test_unquoted_name_comma_is_flagged(self):
+        raw=b'market id,market symbol,market name,trade quantity,trade price,date/time [utc]\n12,T,A, B,1,50,Jan/01/2010 00:00:00\n'
+        rows,_=parse_member(raw,"trades","12",1)
+        self.assertTrue(rows[0]["source_name_comma_repair"])
+        self.assertEqual(rows[0]["quantity"],1)
     def test_invalid_date_fails(self):
         with self.assertRaises(ValueError):date_value("Feb/30/2012 00:00:00","trades")
     def test_duplicate_records_retained(self):
