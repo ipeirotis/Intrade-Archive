@@ -19,3 +19,5 @@ It demonstrates a safe sequence:
 This example verifies surviving-file consistency. It does not certify complete historical coverage or infer settlement outcomes.
 
 For an individual market, replace the selected ID with an explicit string and keep the same filtered reads. Examine its coverage flags first; Obama/Romney 2012 are intentionally unsuitable as examples of complete trade-file coverage.
+
+For the preserved source snapshot, this selects **27824 / EURO.SWEDEN.YES**, with **13 trade records and 34 daily summaries** spanning **2003-08-11 to 2003-09-13**. Both row counts reconcile with the spreadsheet; 27 daily rows report zero volume.

@@ -9,6 +9,7 @@ This repository preserves the original archival files added on **2 April 2013**,
 - **[Download research tables and the offline explorer](https://github.com/ipeirotis/Intrade-Archive/releases)** — versioned CSV/Parquet exports, checksums, and coverage reports.
 - **[Original source files](data/)** — the spreadsheet and ZIPs remain byte-for-byte unchanged.
 - **[Data dictionary](docs/DATA_DICTIONARY.md)** — fields, units, time conventions and source differences.
+- **[Verified quality report](docs/QUALITY_REPORT.md)** — 2,129,385 trade records and 2,035,482 daily records, with observed dates spanning 2002-11-07 to 2013-03-10.
 - **[Coverage and limitations](docs/COVERAGE.md)** — what missing files and suspicious observations mean.
 - **[Reproduce the exports](#reproduce-the-exports)** — one local build, no Intrade service required.
 - **[Citation](CITATION.cff)** and **[rights](RIGHTS.md)**.

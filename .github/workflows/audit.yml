@@ -1,7 +1,5 @@
 name: Archive audit
 on:
-  push:
-    branches: [archive-modernization]
   workflow_dispatch:
 permissions:
   contents: read

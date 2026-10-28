@@ -21,6 +21,7 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: node --check site/app.js
       - run: python scripts/build_archive.py
+      - run: python scripts/validate_outputs.py
       - run: python examples/load_contract.py
       - run: python -m pip install playwright==1.55.0
       - run: python -m playwright install --with-deps chromium
@@ -46,3 +47,43 @@ jobs:
           name: intrade-site
           path: build/site/
           retention-days: 30
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/master'
+        with:
+          path: build/site
+  release:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: intrade-release
+          path: release
+      - name: Publish immutable v1.0.0 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo "Release v1.0.0 already exists; its assets will not be replaced."
+          else
+            gh release create v1.0.0 release/* --target "$GITHUB_SHA" --title "Intrade Historical Archive v1.0.0" --notes-file docs/RELEASE_NOTES.md
+          fi
+  pages:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Deploy explorer
+        id: deployment
+        uses: actions/deploy-pages@v4

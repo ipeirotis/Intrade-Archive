@@ -9,7 +9,7 @@ metadata={"version":"1.0.0","source_commit":"620380b2ade7504e270239ecf98b68995c3
 (DATA/"BUILD.json").write_text(json.dumps(metadata,indent=2)+"\n")
 for name in ["README.md","RIGHTS.md","LICENSE","CITATION.cff"]:
     (DATA/name).write_bytes((ROOT/name).read_bytes())
-for name in ["DATA_DICTIONARY.md","COVERAGE.md","PRESERVATION.md"]:
+for name in ["DATA_DICTIONARY.md","COVERAGE.md","PRESERVATION.md","QUALITY_REPORT.md"]:
     (DATA/name).write_bytes((ROOT/"docs"/name).read_bytes())
 (DATA/"SHA256SUMS").write_text("".join(f"{sha256(p)}  {p.name}\n" for p in sorted(DATA.iterdir()) if p.is_file() and p.name!="SHA256SUMS"))
 deterministic_zip(RELEASE/"intrade-research-v1.0.0.zip",((p.name,p.read_bytes()) for p in sorted(DATA.iterdir()) if p.is_file()))
