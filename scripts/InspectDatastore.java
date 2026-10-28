@@ -21,9 +21,9 @@ public class InspectDatastore {
     try(var in=new ObjectInputStream(new FileInputStream(args[0]))) {
       in.setObjectInputFilter(info -> {
         var c=info.serialClass();
-        if(info.depth()>100 || info.references()>10000000 || info.arrayLength()>200000000) return ObjectInputFilter.Status.REJECTED;
+        if(info.depth()>1000 || info.references()>100000000 || info.arrayLength()>200000000) return ObjectInputFilter.Status.REJECTED;
         if(c==null || c.isPrimitive() || c.isArray() || c.getName().startsWith("java.util.") || c.getName().startsWith("java.lang.")) return ObjectInputFilter.Status.ALLOWED;
-        return ObjectInputFilter.Status.REJECTED;
+        System.out.println("REJECTED_CLASS="+c.getName()); return ObjectInputFilter.Status.REJECTED;
       });
       System.out.println("VERSION="+in.readLong());
       walk(in.readObject(),"root",0);
