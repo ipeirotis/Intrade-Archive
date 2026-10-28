@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 type: dataset
-message: "Please cite both papers listed in references and README.md. Record the archive release tag or commit used for reproducibility. BibTeX is available in references.bib."
+message: "When using this archive, please cite both papers listed in references and the dataset version identified by the DOI below. Full citations are in CITATION.md and README.md; BibTeX for all three citations is in references.bib."
 title: "Intrade Historical Archive"
 authors:
   - family-names: Ipeirotis

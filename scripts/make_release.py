@@ -9,7 +9,7 @@ RELEASE.mkdir(parents=True,exist_ok=True)
 VERSION="1.0.1"
 metadata={"version":VERSION,"source_commit":"620380b2ade7504e270239ecf98b68995c384aa8","build_commit":os.environ.get("GITHUB_SHA","local-unrecorded"),"python_dependencies":(ROOT/"requirements.txt").read_text(),"timestamp_policy":"Trade CSV timestamps use UTC; daily observations use business dates."}
 (DATA/"BUILD.json").write_text(json.dumps(metadata,indent=2)+"\n")
-documents = ["README.md","RIGHTS.md","LICENSE","CITATION.cff","references.bib","CONTRIBUTING.md",
+documents = ["README.md","RIGHTS.md","LICENSE","CITATION.md","CITATION.cff","references.bib","CONTRIBUTING.md",
              "docs/DATA_DICTIONARY.md","docs/COVERAGE.md","docs/PRESERVATION.md",
              "docs/QUALITY_REPORT.md","docs/ZENODO_DEPOSIT.md"]
 bundled_files = {name: Path(name).name for name in documents}
