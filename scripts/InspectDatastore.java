@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.*;
-/** Read-only filtered inspection; reports incomplete serialization without altering the file. */
+/** Report serialization structure through a filtered input stream. */
 public class InspectDatastore {
   static class InspectInput extends ObjectInputStream {
     long arrays=0,bytes=0;
@@ -30,7 +30,7 @@ public class InspectDatastore {
         if(root instanceof Map<?,?> m)System.out.println("ROOT_KEYS="+m.keySet());
       } catch(EOFException e) {
         System.out.println("DATASTORE_STATUS=incomplete_serialized_stream");
-        System.out.println("The stream ended before its top-level object was complete. Preserve original bytes; no completeness claim is possible.");
+        System.out.println("The stream ended before its top-level object was complete.");
       }
       System.out.println("COMPLETED_OBJECT_TYPES="+in.types);
       System.out.println("COMPLETED_BYTE_ARRAYS="+in.arrays+" TOTAL_BYTES="+in.bytes);

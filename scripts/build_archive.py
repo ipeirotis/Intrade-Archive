@@ -140,7 +140,7 @@ def source_inventory():
         gitsha=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
         if gitsha!=item["git_blob_sha1"]: raise ValueError("Original source changed: "+item["path"])
         manifest.append(dict(item,sha256=hashlib.sha256(raw).hexdigest()))
-    json_write(DATA/"original-manifest.json",dict(source_commit=baseline["source_commit"],files=manifest))
+    json_write(DATA/"original-manifest.json",dict(source_commit=baseline["source_commit"],scope=baseline["scope"],files=manifest))
     (DATA/"ORIGINAL_SHA256SUMS").write_text("".join(f"{r['sha256']}  {r['path']}\n" for r in manifest),encoding="utf-8")
     return baseline["source_commit"]
 
@@ -248,6 +248,7 @@ def main():
     small_table(SITE/"source_files.csv",file_manifest)
     for p in (ROOT/"site").iterdir():
         if p.is_file():shutil.copy2(p,SITE/p.name)
+    shutil.copy2(ROOT/"references.bib",SITE/"references.bib")
     (SITE/".nojekyll").touch()
     print(json.dumps(stats,indent=2))
     print("EXAMPLE",json.dumps(next((c for c in coverage if c["contract_id"]==stats["example_contract"]),{})))

@@ -1,4 +1,4 @@
-"""Read-only inventory of original archive sources; never extracts or edits them."""
+"""Report source file checksums, spreadsheet metadata and archive inventories."""
 import collections
 import hashlib
 import json
@@ -39,7 +39,7 @@ def main():
                 for i in list(representatives.values())[:4]:
                     with z.open(i) as stream:
                         print("SAMPLE", i.filename, repr(stream.read(1600)))
-    p = ROOT / "war/WEB-INF/appengine-generated/local_db.bin"
+    p = ROOT / "data/legacy-datastore.bin"
     with p.open("rb") as f:
         print("DATASTORE_HEADER", repr(f.read(128)))
     print("DATASTORE_SHA256", hashlib.sha256(p.read_bytes()).hexdigest())

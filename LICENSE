@@ -2,10 +2,9 @@ MIT License — new archive modernization tooling only
 
 Copyright (c) 2026 Panos Ipeirotis
 
-This license applies only to the new scripts/, site/, tests/, examples/ code
-and .github/workflows/ code added by the archive modernization. It does not
-apply to the original Intrade data, historical documentation, bundled
-dependencies, or legacy src/ and war/ code. See RIGHTS.md.
+This license applies to the scripts/, site/, tests/, examples/ code and
+.github/workflows/ code added by the archive modernization. Rights for the
+historical source material are documented separately in RIGHTS.md.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of the software covered by this license and associated documentation files

@@ -1,49 +1,52 @@
 # Preservation, releases and hosting
 
-## Historical baseline
+## Original data
 
-Original commit: `620380b2ade7504e270239ecf98b68995c384aa8` (2 April 2013).
+The historical baseline is commit [`620380b2ade7504e270239ecf98b68995c384aa8`](https://github.com/ipeirotis/Intrade-Archive/tree/620380b2ade7504e270239ecf98b68995c384aa8), dated 2 April 2013.
 
-`preservation/original-manifest.json` records every original tracked file's path, byte length and Git blob SHA-1. The build verifies that baseline before conversion and produces SHA-256 checksums as an independent integrity record. No original files, generated classes, JARs or datastore bytes have been removed.
+`preservation/original-manifest.json` records the six retained original files: the contract spreadsheet, two ZIP archives, historical notes, API reference and datastore snapshot. Each entry records its byte length and original Git blob SHA-1. The datastore entry also records its historical path.
 
-The release contains:
+The build verifies these hashes and produces SHA-256 checksums. Version 1.0.1 moves the datastore to `data/legacy-datastore.bin` and removes the retired crawler, compiled classes, dependency JARs and deployment configuration from the current tree. The historical commit and v1.0.0 release preserve the earlier repository layout.
 
-- `intrade-original-snapshot.zip`: every file in the historical baseline.
-- `intrade-research-v1.0.0.zip`: documented CSV/Parquet tables, provenance, diagnostics and checksums.
-- `intrade-explorer-v1.0.0.zip`: a self-contained static explorer with contract-specific original CSV downloads.
-- Separately downloadable coverage catalog, source-file manifest, quality report and checksum files.
+## Release contents
 
-An original contract download contains unchanged CSV member bytes; filenames are prefixed with the source-file ID to avoid collisions. The source-file manifest records their original ZIP paths.
+- `intrade-original-snapshot.zip`: the six retained original data and reference files.
+- `intrade-research-v1.0.1.zip`: CSV/Parquet tables, documentation, citations, provenance, quality reports and checksums.
+- `intrade-explorer-v1.0.1.zip`: the static explorer, chart series and original contract-file downloads.
+- Separate coverage and source-file catalogs, quality report, source manifests, build metadata and checksum files.
 
-Generated ZIP member timestamps and gzip timestamps are fixed for reproducibility. `BUILD.json` records the build commit. Exact Parquet bytes depend on the pinned writer/dependency version; row-level semantic equality matters across toolchain upgrades.
+Contract downloads contain the original CSV member bytes. Filenames carry a source-file ID prefix, and the source-file manifest maps each file to its original ZIP path.
 
-## Datastore inspection
+Generated ZIP member timestamps and gzip timestamps are fixed. `BUILD.json` records the build commit and pinned Python dependencies. Validation compares CSV and Parquet values row by row.
 
-The original datastore is a Java serialization stream, version 1, with SHA-256:
+## Datastore snapshot
+
+The original datastore uses Java serialization. Its SHA-256 is:
 
 `ae9e86112f9953a70bdce91c427ff3cf58e688e81d0e5611dd261bf3d3ffb9e7`
 
-A filtered read of the stream reaches EOF before a complete top-level object can be read. The inspection tool reports completed object/byte-array counts and an explicit incomplete-stream status. It does not modify the source or claim a complete recovery.
-
-No missing trades are filled from this snapshot. The failed complete read does not imply that every embedded record is unusable; partial recovery is a separate research task. Preserve the file because it may contain unique material. Its relationship to the later CSV exports remains unverified.
+Inspection reaches EOF while reading the top-level object. Before EOF, it completes 2,131,476 byte arrays containing 29,198,752 bytes. These counts describe serialized objects. The research tables are built from the spreadsheet and CSV archives.
 
 Run the inspection with Java 17 or later:
 
 ```bash
-java scripts/InspectDatastore.java war/WEB-INF/appengine-generated/local_db.bin
+java scripts/InspectDatastore.java data/legacy-datastore.bin
 ```
 
-The tool permits only standard Java utility/language classes and arrays during deserialization and does not launch the legacy application.
+The inspection tool permits standard Java utility/language classes and arrays during deserialization.
 
 ## Release procedure
 
-The build workflow validates sources, tests parsers, converts all files, runs the loading example and checks the explorer. Only successful builds may publish a versioned release. Existing release assets must not be silently replaced. Change the version and describe any changes to derived data when making another release.
+1. Update the release version in the citation metadata, packaging script, workflow and documentation.
+2. Run source verification, parser tests, conversion, table validation, the loading example and explorer checks.
+3. Publish the versioned release with its build metadata and checksums.
+4. Retain existing release assets as immutable snapshots.
 
-Keep known source anomalies as explicit flags; do not rewrite the original snapshot.
+Record source anomalies as quality flags. Publish corrections and transformations as documented derived data.
 
 ## Static website
 
-The explorer is buildless HTML/CSS/JavaScript. It makes no external analytics requests and requires no backend or live Intrade connection.
+The explorer uses HTML, CSS and JavaScript, with locally packaged data files. GitHub Pages hosts the public version at https://ipeirotis.github.io/Intrade-Archive/.
 
 Serve the downloaded explorer folder with:
 
@@ -51,10 +54,10 @@ Serve the downloaded explorer folder with:
 python -m http.server 8000 --directory intrade-explorer
 ```
 
-For GitHub Pages, set **Settings → Pages → Build and deployment → Source → GitHub Actions**. The repository includes a deployment job for the generated site. A deployment is not considered published until GitHub returns a successful Pages deployment and URL.
+For GitHub Pages, use **Settings → Pages → Build and deployment → Source → GitHub Actions**. The build workflow deploys the generated site after validation.
 
-## DOI deposit
+## Citations and preservation deposit
 
-See [ZENODO_DEPOSIT.md](ZENODO_DEPOSIT.md). A GitHub release alone does not create a DOI. Publish the actual deposit under an authenticated preservation account, record its assigned DOI, then update `CITATION.cff` and the README. Do not use a placeholder DOI.
+The [README](../README.md#cite) and [BibTeX file](../references.bib) provide the two recommended paper citations. Record the archive release or commit alongside those references.
 
-The inspection completed 2,131,476 byte arrays (29,198,752 array-content bytes) before EOF. Those counts describe serialization objects, not recovered contracts or trades; the arrays have not been semantically reconciled to the CSV exports.
+A Zenodo deposit provides a permanent copy and a DOI for a specific dataset version. [ZENODO_DEPOSIT.md](ZENODO_DEPOSIT.md) lists the files and metadata for that optional preservation step.

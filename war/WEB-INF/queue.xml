@@ -1,6 +1,0 @@
-<queue-entries>
-  <queue>
-    <name>default</name>
-    <rate>10/s</rate>
-  </queue>
-</queue-entries>

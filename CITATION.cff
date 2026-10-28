@@ -1,18 +1,49 @@
 cff-version: 1.2.0
 type: dataset
-message: "Please cite this dataset and record the release tag or commit used."
+message: "Please cite both papers listed in references and README.md. Record the archive release tag or commit used for reproducibility. BibTeX is available in references.bib."
 title: "Intrade Historical Archive"
 authors:
   - family-names: Ipeirotis
     given-names: Panos
     affiliation: "New York University, Stern School of Business"
-version: 1.0.0
+version: 1.0.1
 date-released: 2026-10-28
 url: "https://github.com/ipeirotis/Intrade-Archive"
 repository-code: "https://github.com/ipeirotis/Intrade-Archive"
-abstract: "Historical Intrade contract metadata, daily market summaries and trade records, with preserved source archives, explicit coverage limitations, reproducible research exports and a searchable static explorer."
+abstract: "Historical Intrade contract metadata, daily market summaries and trade records, with original source archives, coverage reports, reproducible research exports and a searchable explorer."
 keywords:
   - prediction markets
   - Intrade
   - historical data
   - forecasting
+references:
+  - type: conference-paper
+    title: "Modeling Volatility in Prediction Markets"
+    authors:
+      - family-names: Archak
+        given-names: Nikolay
+      - family-names: Ipeirotis
+        given-names: Panagiotis G.
+    year: 2009
+    collection-title: "Proceedings of the 10th ACM Conference on Electronic Commerce"
+    collection-type: "EC '09"
+    start: 275
+    end: 284
+    publisher:
+      name: "Association for Computing Machinery"
+    doi: "10.1145/1566374.1566414"
+    url: "https://doi.org/10.1145/1566374.1566414"
+  - type: report
+    title: "Modeling Dependency in Prediction Markets"
+    authors:
+      - family-names: Archak
+        given-names: Nikolay
+      - family-names: Ipeirotis
+        given-names: Panagiotis G.
+    year: 2010
+    month: 12
+    institution:
+      name: "New York University, Center for Digital Economy Research"
+    number: "CeDER-10-05"
+    notes: "Working paper"
+    url: "https://ssrn.com/abstract=1718942"

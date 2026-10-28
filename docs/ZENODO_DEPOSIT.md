@@ -1,6 +1,23 @@
-# Prepared Zenodo deposit
+# Zenodo deposit guide
 
-This is a deposit handoff, not evidence that a DOI has been issued.
+Zenodo can preserve a frozen release of the Intrade data and assign it a dataset DOI. The [two papers in the README](../README.md#cite) provide the recommended scholarly citations.
+
+## Files to deposit
+
+Use files from the same [GitHub release](https://github.com/ipeirotis/Intrade-Archive/releases). For version 1.0.1, upload:
+
+| File | Contents |
+| --- | --- |
+| `intrade-original-snapshot.zip` | Original contract spreadsheet, two CSV archives, historical notes, API reference and datastore snapshot |
+| `intrade-research-v1.0.1.zip` | CSV/Parquet tables, documentation, citations, provenance, quality report and checksums |
+| `original-manifest.json` and `ORIGINAL_SHA256SUMS` | Original-file inventory and hashes |
+| `quality_report.json` | Record counts, observed dates and quality diagnostics |
+| `BUILD.json` | Build commit and dependency versions |
+| `SHA256SUMS` | Release asset checksums |
+
+The optional `intrade-explorer-v1.0.1.zip` adds the searchable explorer and contract downloads. The optional `contracts.csv` and `source_files.csv` offer direct access to the catalogs included in the research ZIP.
+
+`SHA256SUMS` covers all GitHub release assets. When depositing a subset, verify the entries corresponding to the uploaded files.
 
 ## Metadata
 
@@ -8,33 +25,34 @@ This is a deposit handoff, not evidence that a DOI has been issued.
 - **Title:** Intrade Historical Archive
 - **Creator:** Ipeirotis, Panos
 - **Affiliation:** New York University, Stern School of Business
-- **Version:** 1.0.0
-- **Publication date:** 2026-10-28
+- **Version:** 1.0.1
+- **Publication date:** Use the deposit's publication date.
 - **Keywords:** prediction markets; Intrade; historical data; forecasting
 - **Related source:** https://github.com/ipeirotis/Intrade-Archive
 - **Historical source commit:** 620380b2ade7504e270239ecf98b68995c384aa8
 
 ## Description
 
-Historical Intrade contract metadata, daily market summaries and individual trade records, preserved with original archives and modern reproducible access tools. The source spreadsheet contains 17,295 contracts across 22 category labels. The collection includes documented gaps, notably 12 missing trade files with supplemental daily closing-price histories. Standardized CSV/Parquet tables preserve source provenance and retain zero values, repeated trade tuples and separate daily source types. The release also includes a searchable static explorer, coverage catalog, source manifests and SHA-256 checksums.
+Historical Intrade contract metadata, daily market summaries and individual trade records. The archive contains 17,295 contracts across 22 category labels, 2,129,385 trade records and 2,035,482 daily records. Observed dates span 7 November 2002 to 10 March 2013.
 
-Counts and observed date ranges in the accompanying quality report describe surviving records, not complete exchange history. The historical datastore stream is incomplete on full deserialization and is retained without claiming recovery of missing observations.
+The collection includes original archives, reproducible CSV/Parquet tables, source provenance and quality reports. Twelve contracts have missing trade files and supplemental daily closing-price histories. Exports retain source values and repeated trade tuples, and label each daily source separately. The original datastore snapshot and XML API reference accompany the data.
 
-## Files to deposit
+## Related papers
 
-Upload all assets from the versioned GitHub release, including the original snapshot, research export, explorer, coverage and source manifests, quality report, BUILD.json and SHA256SUMS. The build commit in BUILD.json identifies the conversion version.
+1. Archak, Nikolay, and Panagiotis G. Ipeirotis. 2009. **[Modeling Volatility in Prediction Markets](https://doi.org/10.1145/1566374.1566414)**. In *Proceedings of the 10th ACM Conference on Electronic Commerce (EC '09)*, 275–284. ACM.
+2. Archak, Nikolay, and Panagiotis G. Ipeirotis. 2010. **[Modeling Dependency in Prediction Markets](https://ssrn.com/abstract=1718942)**. NYU Center for Digital Economy Research Working Paper No. CeDER-10-05, December. [NYU record](https://archive.nyu.edu/handle/2451/29885).
+
+Add the papers as related publications in the deposit metadata.
 
 ## Rights
 
-The original data have no verified blanket reuse license in the preserved repository. Read RIGHTS.md and select terms supported by the depositor's actual rights; do not assign the MIT tooling license to the dataset. This rights metadata must be resolved accurately before publishing a dataset-wide license.
+Use [RIGHTS.md](../RIGHTS.md) to distinguish the original data from the MIT-licensed research tools. Select deposit rights and access terms supported by the depositor's permissions.
 
-## Complete the deposit
+## Publish
 
-1. Sign in to the intended Zenodo account.
-2. Create a Dataset deposit using the metadata and release assets above.
-3. Verify file checksums and record accurate rights/access terms.
-4. Publish and copy the assigned version DOI.
-5. Add that DOI to CITATION.cff and link the deposit in README.md.
-6. Preserve future derived versions as new versions, not replacements.
-
-No Zenodo connection was available during modernization, so no DOI is asserted here.
+1. Create a Dataset deposit in the intended Zenodo account.
+2. Upload the release files and verify their checksums.
+3. Add the metadata, related papers and applicable rights/access terms.
+4. Publish the deposit and record its assigned version DOI.
+5. Add the dataset DOI to the archive metadata in `CITATION.cff` and link the deposit in the README.
+6. Publish subsequent releases as new deposit versions.

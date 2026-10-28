@@ -25,19 +25,19 @@ Generated from the immutable 2013 source snapshot by the modernization build. Th
 
 | Diagnostic | Count | Interpretation |
 | --- | ---: | --- |
-| Trade rows participating in repeated timestamp/price/quantity tuples | 180,382 | Potential repeated executions; not automatically erroneous duplicates |
+| Trade rows participating in repeated timestamp/price/quantity tuples | 180,382 | Equal values at the source's one-second timestamp precision; all rows retained |
 | Excess daily rows sharing contract, source type and date | 9,202 | Retained; inspect before day-level aggregation |
-| Contract/date combinations appearing in both daily source types | 13,766 | Compare separately; do not concatenate and treat as independent days |
+| Contract/date combinations appearing in both daily source types | 13,766 | Overlapping main summaries and supplemental prices, labeled by source |
 | Daily records with zero reported volume | 1,792,290 | These include both source types and repeated dates |
 | Records requiring the unquoted-market-name comma repair | 17,444 | Flagged; raw CSV bytes remain intact |
-| Rows with a checked price outside 0–100 | 1,283 | A diagnostic of unusual scale/values, not a claim of invalid records |
+| Rows with a checked price outside 0-100 | 1,283 | Values outside the common binary-market scale, retained for inspection |
 
-The observed dates are extrema, not continuous coverage guarantees. In particular, 17,295 contracts does not mean 17,295 complete histories.
+The date range runs from the earliest to the latest surviving observation. Per-contract counts, dates and coverage states are available in the contract catalog.
 
 ## Worked example verified
 
-Contract **27824**, `EURO.SWEDEN.YES` (“Sweden to vote YES to the Euro in next referendum”), has 13 observed trades and 34 main summary records, matching the spreadsheet counts. Its observed dates run from 2003-08-11 through 2003-09-13. Twenty-seven summary rows have zero volume. This is an example of surviving-file reconciliation, not an independent completeness certification.
+Contract **27824**, `EURO.SWEDEN.YES` ("Sweden to vote YES to the Euro in next referendum"), has 13 observed trades and 34 main summary records, matching the spreadsheet counts. Its observed dates run from 2003-08-11 through 2003-09-13. Twenty-seven summary rows have zero volume.
 
 ## Datastore result
 
-The historical Java stream ends before its top-level object is complete. Inspection completed 2,131,476 byte arrays containing 29,198,752 bytes before EOF. These are serialization counts, not trade or contract counts. No records from this stream are incorporated into the research tables.
+The historical Java stream ends before its top-level object is complete. Inspection completed 2,131,476 serialized byte arrays containing 29,198,752 bytes before EOF. The research tables are built from the spreadsheet and archived CSVs. The stream is preserved separately as `data/legacy-datastore.bin`.

@@ -2,46 +2,47 @@
 
 Historical Intrade prediction-market data curated by **Panos Ipeirotis, NYU Stern**.
 
-This repository preserves the original archival files added on **2 April 2013**, the legacy Java/Google App Engine collector, and modern tools for inspecting and reusing the surviving observations. It is a historical research collection; it does not collect current markets or promise complete coverage of Intrade.
+This archive contains contract metadata, daily market summaries and individual trade records, with observed dates spanning **7 November 2002 to 10 March 2013**. The original data were added on **2 April 2013**. Research tools convert the source files into CSV and Parquet tables, report coverage, and power a searchable explorer.
 
 ## Start here
 
-- **[Download research tables and the offline explorer](https://github.com/ipeirotis/Intrade-Archive/releases)** — versioned CSV/Parquet exports, checksums, and coverage reports.
-- **[Original source files](data/)** — the spreadsheet and ZIPs remain byte-for-byte unchanged.
-- **[Data dictionary](docs/DATA_DICTIONARY.md)** — fields, units, time conventions and source differences.
-- **[Verified quality report](docs/QUALITY_REPORT.md)** — 2,129,385 trade records and 2,035,482 daily records, with observed dates spanning 2002-11-07 to 2013-03-10.
-- **[Coverage and limitations](docs/COVERAGE.md)** — what missing files and suspicious observations mean.
-- **[Reproduce the exports](#reproduce-the-exports)** — one local build, no Intrade service required.
-- **[Citation](CITATION.cff)** and **[rights](RIGHTS.md)**.
-- **[Preservation and release process](docs/PRESERVATION.md)** — immutable sources, checksums, DOI deposit and website hosting.
+- **[Explore the archive](https://ipeirotis.github.io/Intrade-Archive/)** — search contracts, view daily prices and download source observations.
+- **[Download research tables and the offline explorer](https://github.com/ipeirotis/Intrade-Archive/releases)** — versioned exports, checksums and coverage reports.
+- **[Original source files](data/)** — the contract spreadsheet, two ZIP archives, historical notes and datastore snapshot.
+- **[Data dictionary](docs/DATA_DICTIONARY.md)** — fields, units, time conventions and source formats.
+- **[Quality report](docs/QUALITY_REPORT.md)** — inventory and diagnostics for 2,129,385 trade records and 2,035,482 daily records.
+- **[Coverage](docs/COVERAGE.md)** — availability by contract and source.
+- **[Reproduce the exports](#reproduce-the-exports)** — build the research tables and explorer locally.
+- **[Citations](#cite)** and **[rights](RIGHTS.md)**.
+- **[Preservation and releases](docs/PRESERVATION.md)** — source hashes, versioned downloads and website hosting.
 
-## What survives
+## Archive contents
 
-The original spreadsheet contains **17,295 contract rows** across **22 category labels**. The main ZIP contains **28,108 CSV files**. A separate ZIP supplies **12 supplemental daily closing-price histories** for contracts whose trade files are listed as missing. File counts are not trade counts, and the spreadsheet's reported counts are not proof that those observations survived.
+The contract spreadsheet contains **17,295 rows** across **22 category labels**. The main ZIP contains **28,108 CSV files**. The supplemental ZIP supplies **12 daily closing-price histories**. Each contract's coverage record reports available files, observed row counts and dates.
 
-| Original file | Role |
+| Original file | Contents |
 | --- | --- |
 | `data/Intrade-Contracts-NoFinancial.xlsx` | Contract metadata and reported summary/trade counts |
 | `data/Intrade-Contracts-NoFinancial.zip` | Per-contract market summaries and trade records |
-| `data/Intrade-Contracts-WithClosingPrices-MissingTrades.zip` | Supplemental daily closing-price histories; not recovered trades |
+| `data/Intrade-Contracts-WithClosingPrices-MissingTrades.zip` | Supplemental daily closing-price histories for 12 contracts |
 | `data/Notes.txt` | Historical list of 12 missing trade files |
-| `docs/Intrade_XML_API.pdf` | Historical API reference, not a complete specification of the later data-warehouse exports |
-| `war/WEB-INF/appengine-generated/local_db.bin` | Preserved legacy datastore snapshot; treated separately from the research exports |
+| `docs/Intrade_XML_API.pdf` | Historical Intrade XML API reference |
+| `data/legacy-datastore.bin` | Original Java-serialized datastore snapshot |
 
-The `NoFinancial` label is inherited from the source files. The precise historical exclusion rule is not recorded. Some surviving categories concern economic subjects, and test markets are present. Select your research population explicitly.
+The `NoFinancial` filenames are inherited from the source collection. The spreadsheet's category labels identify the available subjects, including economic subjects and test markets.
 
-## Important limitations
+## Working with the data
 
-- Missing trades include Obama and Romney's individual 2012 presidential contracts. Supplemental daily prices do **not** reconstruct their trade histories.
-- Main summaries and supplemental closing prices use different source formats. They stay separate in the normalized tables and charts, including overlapping dates.
-- Zero prices, zero-volume days, stale closes and repeated trade tuples are retained. They must not be silently interpreted as probabilities, missing values, or duplicate errors.
-- Trade timestamps are explicitly labeled UTC in their CSV header. Daily business dates have no verified time-zone definition and remain dates.
-- Contract end dates are not verified settlement dates. The spreadsheet does not provide settlement prices or outcomes.
-- Reported count discrepancies and coverage endpoints describe the available files; they do not certify historical completeness.
+- Twelve contracts have missing trade files, including Obama and Romney's individual 2012 presidential contracts. Supplemental daily prices are available for these contracts.
+- Main summaries and supplemental closing prices have distinct source formats. The research tables label each source, and the explorer displays separate chart series.
+- Source values include zero prices, zero-volume days, repeated closes and repeated trade tuples. The exports retain these observations and provide quality flags.
+- Trade timestamps use UTC. Daily observations retain their source business dates.
+- The metadata supply contract end dates. The data dictionary describes each date field and its source.
+- Coverage records compare observed counts with spreadsheet counts and identify the first and last available observation.
 
 ## Reproduce the exports
 
-Use Python 3.12 and Node.js (Node is used only for the website syntax check).
+Use Python 3.12 and Node.js for the build and website syntax check.
 
 ```bash
 git clone https://github.com/ipeirotis/Intrade-Archive.git
@@ -55,34 +56,37 @@ python examples/load_contract.py
 python -m http.server 8000 --directory build/site
 ```
 
-Open `http://localhost:8000` for the explorer. Opening its HTML as a `file://` URL does not support the data fetches.
+Open `http://localhost:8000` for the explorer.
 
-The build verifies every original file against the historical Git blob hashes, validates ZIP CRCs, parses all source records, and writes:
+The build verifies the original data hashes and ZIP CRCs, parses the source records, and writes:
 
 | Output in `build/research/` | Contents |
 | --- | --- |
 | `contracts.csv`, `contracts.parquet` | Metadata, observed coverage, counts and quality flags |
-| `daily.csv.gz`, `daily.parquet` | Both daily sources, labeled separately |
-| `trades.csv.gz`, `trades.parquet` | Individual source trade records; repeated tuples retained and flagged |
+| `daily.csv.gz`, `daily.parquet` | Daily observations labeled by source |
+| `trades.csv.gz`, `trades.parquet` | Individual trade records, with repeated tuples flagged |
 | `source_files.csv` | Source-file IDs, archive/member paths, encoding, row counts and SHA-256 |
 | `quality_report.json` | Aggregate inventory and diagnostics |
-| `original-manifest.json`, `ORIGINAL_SHA256SUMS` | Checksums for all original files |
-| `SHA256SUMS` | Checksums for the generated research deliverables |
+| `original-manifest.json`, `ORIGINAL_SHA256SUMS` | Inventory and checksums for the original data and API reference |
+| `SHA256SUMS` | Checksums for the generated research files |
 
-`build/site/` contains the searchable static explorer, contract-specific original-file ZIPs and daily chart series. Build products are generated, not committed into Git history.
+`build/site/` contains the searchable explorer, original contract-file downloads and daily chart series. Release packages add documentation, citations and build metadata.
 
 ## Use and contribute
 
 Use the coverage catalog to define your sample before loading observations. [The worked example](examples/README.md) selects a contract whose observed row counts reconcile with the metadata, then demonstrates a filtered Parquet read.
 
-Please report corrections with the contract ID, archive name, source member, source row and evidence. Preserve original files and add corrections as separately documented derived data. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Report corrections with the contract ID, archive name, source member, source row and supporting evidence. Add corrections as documented derived data while preserving original source bytes. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The old collector in `src/` and `war/` is retained as historical evidence. The modern build does not run its servlets, contact old Intrade endpoints or require Google App Engine.
+The original collector is available in the repository's [2013 commit](https://github.com/ipeirotis/Intrade-Archive/tree/620380b2ade7504e270239ecf98b68995c384aa8). The current repository contains the archived data and research tools.
 
 ## Cite
 
-Use GitHub's **Cite this repository** button, or cite:
+Please cite these papers when using the archive:
 
-> Ipeirotis, Panos. *Intrade Historical Archive*. Version 1.0.0. https://github.com/ipeirotis/Intrade-Archive
+1. Archak, Nikolay, and Panagiotis G. Ipeirotis. 2009. **[Modeling Volatility in Prediction Markets](https://doi.org/10.1145/1566374.1566414)**. In *Proceedings of the 10th ACM Conference on Electronic Commerce (EC '09)*, 275–284. ACM.
+2. Archak, Nikolay, and Panagiotis G. Ipeirotis. 2010. **[Modeling Dependency in Prediction Markets](https://ssrn.com/abstract=1718942)**. NYU Center for Digital Economy Research Working Paper No. CeDER-10-05, December. [NYU record](https://archive.nyu.edu/handle/2451/29885).
 
-Also record the release tag or commit used. A DOI must be added only after an actual preservation deposit has been published.
+[Download BibTeX](references.bib). [CITATION.cff](CITATION.cff) contains machine-readable archive metadata and both references.
+
+For reproducibility, also record the archive URL and the release tag or commit used, for example: *Intrade Historical Archive*, version 1.0.1, https://github.com/ipeirotis/Intrade-Archive.
