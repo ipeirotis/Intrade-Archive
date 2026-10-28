@@ -15,7 +15,10 @@ def main():
             wb = openpyxl.load_workbook(p, read_only=True, data_only=True)
             for ws in wb:
                 print("SHEET", ws.title, ws.max_row, ws.max_column)
-                for row in list(ws.iter_rows(values_only=True))[:5]:
+                rows = list(ws.iter_rows(values_only=True))
+                print("CATEGORIES", collections.Counter(r[0] for r in rows[1:]))
+                print("MISSING_METADATA", [r for r in rows[1:] if r[5] in [743474,743475]])
+                for row in rows[:5]:
                     print(json.dumps(row, default=str))
             wb.close()
         if p.suffix == ".zip":
@@ -26,15 +29,16 @@ def main():
                 print("NAMES", json.dumps([i.filename for i in members[:25]]))
                 representatives = {}
                 for i in members:
-                    key = (Path(i.filename).suffix, i.filename.split("/")[0])
+                    key = ("trades" if i.filename.endswith("-trades.csv") else "daily", i.filename.split("/")[0])
                     representatives.setdefault(key, i)
-                for i in list(representatives.values())[:15]:
+                for i in list(representatives.values())[:4]:
                     with z.open(i) as stream:
                         print("SAMPLE", i.filename, repr(stream.read(1600)))
     p = ROOT / "war/WEB-INF/appengine-generated/local_db.bin"
     with p.open("rb") as f:
         print("DATASTORE_HEADER", repr(f.read(128)))
     print("DATASTORE_SHA256", hashlib.sha256(p.read_bytes()).hexdigest())
+    return
     from pypdf import PdfReader
     for i, page in enumerate(PdfReader(ROOT / "docs/Intrade_XML_API.pdf").pages):
         text = page.extract_text() or ""
