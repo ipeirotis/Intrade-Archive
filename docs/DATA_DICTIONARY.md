@@ -76,3 +76,7 @@ Prices stay in source units. The 0–100 range check reflects the common binary-
 ## Verification boundaries
 
 The build verifies source hashes, schemas, dates, numeric parsing, IDs, ZIP integrity and output row totals. It flags repeated keys and count mismatches without claiming to reconstruct all missing data. The legacy Java collector's data model is not treated as a definitive specification of the later warehouse CSVs.
+
+## Malformed source names and empty files
+
+Some main-archive records contain unquoted commas in the market-name field. When a record has excess columns, the parser preserves the first two fields and the final nine (summary) or three (trade) fields, joining the intervening fields as the market name. It then validates IDs, dates and numeric fields. Every affected observation has `source_name_comma_repair=true`; counts appear in the file manifest and contract diagnostics. This narrow repair is not applied to supplemental files or short records. Unexpected schemas or invalid typed values stop the build. Empty source files yield zero observations and remain in the manifest.

@@ -25,6 +25,11 @@ def main():
             with zipfile.ZipFile(p) as z:
                 members = [i for i in z.infolist() if not i.is_dir()]
                 print("ZIP", len(members), sum(i.file_size for i in members))
+                headers=collections.Counter()
+                for member in members:
+                    with z.open(member) as stream:
+                        headers[stream.readline(4096).decode("utf-8",errors="replace").strip()]+=1
+                print("ALL_HEADERS", json.dumps(dict(headers)))
                 print("EXTENSIONS", collections.Counter(Path(i.filename).suffix for i in members))
                 print("NAMES", json.dumps([i.filename for i in members[:25]]))
                 representatives = {}
@@ -38,12 +43,6 @@ def main():
     with p.open("rb") as f:
         print("DATASTORE_HEADER", repr(f.read(128)))
     print("DATASTORE_SHA256", hashlib.sha256(p.read_bytes()).hexdigest())
-    return
-    from pypdf import PdfReader
-    for i, page in enumerate(PdfReader(ROOT / "docs/Intrade_XML_API.pdf").pages):
-        text = page.extract_text() or ""
-        if any(term.lower() in text.lower() for term in ["timestamp", "expiryPrice", "tickValue", "TimeAndSales", "ClosingPrice"]):
-            print("API_PAGE", i + 1, text[:14000])
 
 if __name__ == "__main__":
     main()

@@ -69,6 +69,7 @@ def parse_member(raw, kind, cid, source_id):
     text, encoding = decode_csv(raw)
     reader = csv.reader(io.StringIO(text, newline=""), strict=True)
     header = next(reader, None)
+    if header is None and not text.strip(): return [], encoding
     if header != HEADERS[kind]: raise ValueError(f"Unexpected {kind} header: {header}")
     result=[]
     for rowno, r in enumerate(reader, 2):
@@ -198,7 +199,10 @@ def main():
         daily=[]; trades=[]; original_entries=[]
         for z,info,kind,sid in members[cid]:
             raw=z.read(info)
-            parsed,encoding=parse_member(raw,kind,cid,sid)
+            try:
+                parsed,encoding=parse_member(raw,kind,cid,sid)
+            except Exception as exc:
+                raise ValueError(f"{z.filename}:{info.filename}: {exc}") from exc
             fm=file_manifest[sid-1]
             fm.update(sha256=hashlib.sha256(raw).hexdigest(),encoding=encoding,rows=len(parsed),name_comma_repair_rows=sum(r["source_name_comma_repair"] for r in parsed))
             (trades if kind=="trades" else daily).extend(parsed)
@@ -222,7 +226,7 @@ def main():
         bad_price+=sum(r["price"] is not None and not 0<=r["price"]<=100 for r in trades)
         row=dict(c,trade_status=trade_status,known_missing_trade_file=cid in missing,trade_rows=len(trades),summary_rows=len(summary),supplemental_daily_rows=len(supplement),daily_rows=len(daily),first_observed_date=min(observed_dates) if observed_dates else None,last_observed_date=max(observed_dates) if observed_dates else None,first_trade_utc=min(times) if times else None,last_trade_utc=max(times) if times else None,first_daily_date=min(days) if days else None,last_daily_date=max(days) if days else None,trade_count_mismatch=count_mismatch,summary_count_mismatch=summary_mismatch,duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,name_comma_repair_rows=repaired_count,price_outside_0_100_rows=bad_price,source_file_ids=";".join(str(m[3]) for m in members[cid]))
         coverage.append(row)
-        diagnostics.update(trade_rows=len(trades),daily_rows=len(daily),summary_rows=len(summary),supplemental_daily_rows=len(supplement),duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,price_outside_0_100_rows=bad_price,contracts_with_trade_count_mismatch=int(count_mismatch),contracts_with_summary_count_mismatch=int(summary_mismatch))
+        diagnostics.update(trade_rows=len(trades),daily_rows=len(daily),summary_rows=len(summary),supplemental_daily_rows=len(supplement),duplicate_candidate_trade_rows=suspect,duplicate_daily_keys=duplicate_dates,overlapping_daily_source_dates=overlap,zero_volume_daily_rows=zero_volume,name_comma_repair_rows=repaired_count,price_outside_0_100_rows=bad_price,contracts_with_trade_count_mismatch=int(count_mismatch),contracts_with_summary_count_mismatch=int(summary_mismatch))
         writers["daily"].add(daily);writers["trades"].add(trades)
         # Two explicit source series; never blend overlapping dates or infer outcomes.
         series={kind:[[r["date"],r["close"],r["volume"]] for r in sorted(daily,key=lambda x:(x["date"],x["source_file_id"],x["source_row"])) if r["source_type"]==kind] for kind in ["summary","closingPrice"]}

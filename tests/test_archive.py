@@ -16,6 +16,9 @@ class ParsingTests(unittest.TestCase):
         rows,_=parse_member(b'Date,Open,Low,High,Close,Volume\n"Dec 6, 2010",50,49,52,51,0\n',"closingPrice","12",2)
         self.assertEqual([rows[0][k] for k in ["date","open","high","low","close","volume"]],["2010-12-06",50,52,49,51,0])
         self.assertIsNone(rows[0]["open_interest"])
+    def test_empty_source_file(self):
+        rows,_=parse_member(b"","summary","12",1)
+        self.assertEqual(rows,[])
     def test_zero_is_not_missing(self):
         self.assertEqual(number("0"),0)
         self.assertIsNone(number(""))
