@@ -60,4 +60,6 @@ For GitHub Pages, use **Settings → Pages → Build and deployment → Source �
 
 The [README](../README.md#cite) and [BibTeX file](../references.bib) provide the two recommended paper citations. Record the archive release or commit alongside those references.
 
-A Zenodo deposit provides a permanent copy and a DOI for a specific dataset version. [ZENODO_DEPOSIT.md](ZENODO_DEPOSIT.md) lists the files and metadata for that optional preservation step.
+Version **1.0.1** is preserved at **[10.5281/zenodo.23740923](https://doi.org/10.5281/zenodo.23740923)**. The Zenodo record contains the original snapshot ZIP, research ZIP, rights statement, quality report and checksum files.
+
+The research ZIP includes the build metadata, original-file manifest and catalogs. The GitHub release also provides standalone copies and the offline explorer. [ZENODO_DEPOSIT.md](ZENODO_DEPOSIT.md) lists the six deposited files, explains checksum verification and describes the procedure for future versions.

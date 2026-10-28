@@ -7,6 +7,7 @@ authors:
     given-names: Panos
     affiliation: "New York University, Stern School of Business"
 version: 1.0.1
+doi: "10.5281/zenodo.23740923"
 date-released: 2026-10-28
 url: "https://github.com/ipeirotis/Intrade-Archive"
 repository-code: "https://github.com/ipeirotis/Intrade-Archive"

@@ -7,6 +7,7 @@ This archive contains contract metadata, daily market summaries and individual t
 ## Start here
 
 - **[Explore the archive](https://ipeirotis.github.io/Intrade-Archive/)** — search contracts, view daily prices and download source observations.
+- **[Preserved dataset on Zenodo](https://doi.org/10.5281/zenodo.23740923)** — version 1.0.1 source archives, research tables and provenance.
 - **[Download research tables and the offline explorer](https://github.com/ipeirotis/Intrade-Archive/releases)** — versioned exports, checksums and coverage reports.
 - **[Original source files](data/)** — the contract spreadsheet, two ZIP archives, historical notes and datastore snapshot.
 - **[Data dictionary](docs/DATA_DICTIONARY.md)** — fields, units, time conventions and source formats.
@@ -89,4 +90,8 @@ Please cite these papers when using the archive:
 
 [Download BibTeX](references.bib). [CITATION.cff](CITATION.cff) contains machine-readable archive metadata and both references.
 
-For reproducibility, also record the archive URL and the release tag or commit used, for example: *Intrade Historical Archive*, version 1.0.1, https://github.com/ipeirotis/Intrade-Archive.
+For reproducibility, also cite the dataset version used:
+
+> Ipeirotis, Panos. 2026. *Intrade Historical Archive* (Version 1.0.1) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.23740923
+
+The [Zenodo deposit](https://doi.org/10.5281/zenodo.23740923) preserves the original data and research exports. Record the release tag or commit when using a later repository revision.
